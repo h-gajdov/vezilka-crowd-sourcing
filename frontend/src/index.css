@@ -13,6 +13,7 @@
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-ring: hsl(var(--ring));
   --color-popover: hsl(var(--popover));
+  --color-input: hsl(var(--input));
 }
 
 :root {

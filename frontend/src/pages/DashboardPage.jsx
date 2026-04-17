@@ -11,7 +11,7 @@ import Sidebar from "../components/Sidebar";
 import StatCard from "../components/StatCard";
 import RecentActivities from "../components/RecentActivities";
 
-export default function Dashboard() {
+export default function DashboardPage() {
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar></Sidebar>
