@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+__pycache__
+vezilka-processing/image-to-text/data
+.venv
