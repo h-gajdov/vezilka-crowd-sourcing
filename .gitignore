@@ -27,3 +27,4 @@ __pycache__
 vezilka-processing/image-to-text/data
 .venv
 .env
+backend/media
