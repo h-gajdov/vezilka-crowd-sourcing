@@ -88,6 +88,7 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
             isActive={activeButtonIndex == 4}
             Icon={User}
             collapsed={collapsed}
+            href={"/profile"}
           >
             Профил
           </SidebarButton>
