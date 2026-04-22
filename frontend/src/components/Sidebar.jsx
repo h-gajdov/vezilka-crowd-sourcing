@@ -81,6 +81,7 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
             isActive={activeButtonIndex == 3}
             Icon={Gift}
             collapsed={collapsed}
+            href={"/rewards"}
           >
             Награди
           </SidebarButton>
