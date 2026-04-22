@@ -31,4 +31,16 @@ public class AppUser {
     private double trustScore;
 
     private LocalDateTime createdAt;
+
+    public AppUser(String firstName, String lastName, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = Role.USER;
+        this.points = 0;
+        this.level = 1;
+        this.trustScore = 0;
+        this.createdAt = LocalDateTime.now();
+    }
 }

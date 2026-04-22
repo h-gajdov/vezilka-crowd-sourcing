@@ -1,6 +1,56 @@
-import { ArrowRight, Lock, Mail } from "lucide-react";
+import { ArrowRight, Lock, Mail, AlertCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function LoginPage() {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const navigate = useNavigate();
+
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setError("");
+    setForm({
+      ...form,
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        const msg = await res.text();
+        if (res.status === 400 || res.status === 403) {
+          setError("Погрешна е-пошта или лозинка. Обиди се повторно.");
+        } else {
+          setError(msg || "Најавата не успеа. Обиди се повторно.");
+        }
+        throw new Error(msg || "Registration failed");
+      }
+
+      const data = await res.json();
+      console.log("Logged in:", data);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-background">
       <div className="w-full max-w-md">
@@ -14,10 +64,10 @@ export default function LoginPage() {
           </p>
         </div>
         <div className="p-8 border bg-card border-border rounded-2xl card-elevated">
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <label
-                for="email"
+                htmlFor="email"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Е-пошта
@@ -27,14 +77,17 @@ export default function LoginPage() {
                 <input
                   className="flex w-full h-10 px-3 py-2 pl-10 text-base border rounded-md border-input bg-background ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                   id="email"
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder="you@example.com"
                   type="email"
+                  required
                 ></input>
               </div>
             </div>
             <div className="space-y-2">
               <label
-                for="password"
+                htmlFor="password"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Лозинка
@@ -44,13 +97,22 @@ export default function LoginPage() {
                 <input
                   className="flex w-full h-10 px-3 py-2 pl-10 text-base border rounded-md border-input bg-background ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                   id="password"
+                  value={form.password}
+                  onChange={handleChange}
                   placeholder="••••••••"
                   type="password"
+                  required
                 ></input>
               </div>
             </div>
+            {error && (
+              <div className="flex items-center gap-2 px-4 py-3 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
             <button
-              class="inline-flex mt-5 items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-xl px-8 w-full gap-2"
+              className="inline-flex mt-5 items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-xl px-8 w-full gap-2"
               type="submit"
             >
               Најави се <ArrowRight className="w-4 h-4"></ArrowRight>
