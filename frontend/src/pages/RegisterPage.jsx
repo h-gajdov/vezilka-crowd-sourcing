@@ -49,7 +49,15 @@ export default function RegisterPage() {
       }
 
       const data = await res.json();
-      console.log("Registered:", data);
+      localStorage.setItem("token", data.jwtToken);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+        }),
+      );
       navigate("/dashboard");
     } catch (err) {
       console.error(err.message);
@@ -158,7 +166,7 @@ export default function RegisterPage() {
               </div>
             )}
             <button
-              className="inline-flex mt-5 items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-xl px-8 w-full gap-2"
+              className="inline-flex mt-5 cursor-pointer items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-xl px-8 w-full gap-2"
               type="submit"
             >
               Создај сметка <ArrowRight className="w-4 h-4"></ArrowRight>

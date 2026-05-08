@@ -249,7 +249,7 @@ export default function UploadPage() {
               <button
                 onClick={handleSubmit}
                 disabled={stagedFiles.length === 0}
-                className="inline-flex items-center justify-center w-full gap-2 px-8 mt-8 text-sm font-medium transition-colors whitespace-nowrap ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-xl"
+                className="inline-flex items-center justify-center w-full gap-2 px-8 mt-8 text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-xl"
               >
                 <Upload className="w-4 h-4" />
                 Прикачи содржина
