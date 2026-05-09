@@ -12,6 +12,7 @@ import RewardsPage from "./pages/RewardsPage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthProvider from "./components/AuthProvider.jsx";
 import EditProfilePage from "./pages/EditProfilePage.jsx";
+import PublicFilesPage from "./pages/PublicFilesPage.jsx";
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-
+        <Route path="/public-files" element={<PublicFilesPage />}/>
         <Route
           path="/dashboard"
           element={

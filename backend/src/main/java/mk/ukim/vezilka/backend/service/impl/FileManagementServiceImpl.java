@@ -4,12 +4,15 @@ import mk.ukim.vezilka.backend.model.AppUser;
 import mk.ukim.vezilka.backend.model.Content;
 import mk.ukim.vezilka.backend.model.Transcription;
 import mk.ukim.vezilka.backend.model.enums.ContentType;
+import mk.ukim.vezilka.backend.model.exceptions.ContentNotFoundException;
 import mk.ukim.vezilka.backend.model.exceptions.InvalidFileException;
 import mk.ukim.vezilka.backend.repository.ContentRepository;
 import mk.ukim.vezilka.backend.service.FileManagementService;
 import mk.ukim.vezilka.backend.service.TranscriptionService;
 import mk.ukim.vezilka.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,8 +40,8 @@ public class FileManagementServiceImpl implements FileManagementService {
         this.transcriptionService = transcriptionService;
     }
 
-    private Content createContentEntity(ContentType type, String fileUrl, String topic, Long dialectId, String description, String transcription, boolean isPrivate, AppUser user) {
-        Content content = new Content(type, fileUrl, topic, null, description, isPrivate, user);
+    private Content createContentEntity(String originalFilename, ContentType type, String fileUrl, String topic, Long dialectId, String description, String transcription, boolean isPrivate, AppUser user) {
+        Content content = new Content(originalFilename, type, fileUrl, topic, null, description, isPrivate, user);
         content = contentRepository.save(content);
 
         if (transcription != null && !transcription.isEmpty()) {
@@ -73,7 +76,27 @@ public class FileManagementServiceImpl implements FileManagementService {
         Path targetLocation = userStoragePath.resolve(finalFilename);
         file.transferTo(targetLocation);
 
-        return createContentEntity(contentType, targetLocation.toString(), topic, dialectId, description, transcription, isPrivate, user);
+        return createContentEntity(originalFilename, contentType, targetLocation.toString(), topic, dialectId, description, transcription, isPrivate, user);
+    }
+
+    @Override
+    public Resource loadFileAsResource(String path) {
+        try {
+            Path targetLocation = Paths.get(path).normalize();
+
+            if (!targetLocation.startsWith(this.uploadDir.substring(2))) {
+                throw new RuntimeException("Безбедносна грешка: Обид за пристап надвор од дозволениот директориум.");
+            }
+
+            Resource resource = new UrlResource(targetLocation.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("Датотеката не е пронајдена или не може да се прочита: " + path);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Грешка при вчитување на датотеката: " + path, ex);
+        }
     }
 
     private ContentType determineContentType(String mimeType) {

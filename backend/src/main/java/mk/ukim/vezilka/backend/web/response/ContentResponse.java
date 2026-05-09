@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ContentResponse {
+    private Long id;
+    private String originalFileName;
     private ContentType type;
     private String fileUrl;
     private String topic;
@@ -28,6 +30,8 @@ public class ContentResponse {
     private LocalDateTime createdAt;
 
     public ContentResponse(Content content) {
+        this.id = content.getId();
+        this.originalFileName = content.getOriginalFileName();
         this.type = content.getType();
         this.fileUrl = content.getFileUrl();
         this.topic = content.getTopic();

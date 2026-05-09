@@ -19,6 +19,9 @@ public class Content {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
+    private String originalFileName;
+
     @Enumerated(EnumType.STRING)
     private ContentType type;
 
@@ -45,7 +48,8 @@ public class Content {
     @ManyToOne
     private AppUser uploader;
 
-    public Content(ContentType type, String fileUrl, String topic, Dialect dialect, String description, boolean isPrivate, AppUser uploader) {
+    public Content(String originalFileName, ContentType type, String fileUrl, String topic, Dialect dialect, String description, boolean isPrivate, AppUser uploader) {
+        this.originalFileName = originalFileName;
         this.type = type;
         this.fileUrl = fileUrl;
         this.topic = topic;
