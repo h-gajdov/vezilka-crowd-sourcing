@@ -1,12 +1,15 @@
 package mk.ukim.vezilka.backend.service.impl;
 
+import mk.ukim.vezilka.backend.model.ActivityType;
 import mk.ukim.vezilka.backend.model.AppUser;
 import mk.ukim.vezilka.backend.model.Content;
 import mk.ukim.vezilka.backend.model.Transcription;
 import mk.ukim.vezilka.backend.model.enums.ContentType;
 import mk.ukim.vezilka.backend.model.exceptions.ContentNotFoundException;
 import mk.ukim.vezilka.backend.model.exceptions.InvalidFileException;
+import mk.ukim.vezilka.backend.repository.ActivityTypeRepository;
 import mk.ukim.vezilka.backend.repository.ContentRepository;
+import mk.ukim.vezilka.backend.service.ActivityService;
 import mk.ukim.vezilka.backend.service.FileManagementService;
 import mk.ukim.vezilka.backend.service.TranscriptionService;
 import mk.ukim.vezilka.backend.service.UserService;
@@ -30,14 +33,16 @@ public class FileManagementServiceImpl implements FileManagementService {
     private final ContentRepository contentRepository;
     private final UserService userService;
     private final TranscriptionService transcriptionService;
+    private final ActivityService activityService;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    public FileManagementServiceImpl(ContentRepository contentRepository, UserService userService, TranscriptionService transcriptionService) {
+    public FileManagementServiceImpl(ContentRepository contentRepository, UserService userService, TranscriptionService transcriptionService, ActivityTypeRepository activityTypeRepository, ActivityService activityService) {
         this.contentRepository = contentRepository;
         this.userService = userService;
         this.transcriptionService = transcriptionService;
+        this.activityService = activityService;
     }
 
     private Content createContentEntity(String originalFilename, ContentType type, String fileUrl, String topic, Long dialectId, String description, String transcription, boolean isPrivate, AppUser user) {
@@ -97,6 +102,10 @@ public class FileManagementServiceImpl implements FileManagementService {
         } catch (Exception ex) {
             throw new RuntimeException("Грешка при вчитување на датотеката: " + path, ex);
         }
+        Content content = createContentEntity(contentType, targetLocation.toString(), topic, dialectId, description, transcription, isPrivate, user);
+        ActivityType activityType = activityService.getActivityByName(contentType.name());
+        activityService.logUpload(user, content, activityType);
+        return content;
     }
 
     private ContentType determineContentType(String mimeType) {

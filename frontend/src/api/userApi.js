@@ -107,8 +107,47 @@ export async function removeAvatarPicture() {
     throw new Error("Failed to update user");
   }
 
-    const stored = JSON.parse(localStorage.getItem('user'));
-  localStorage.setItem('user', JSON.stringify({ ...stored, avatarUrl: null }));
+  await refreshUserObj();
+
+  const data = await res.json();
+
+  return data;
+}
+
+export async function getUserDashboardStats() {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const res = await fetch(`${BACKEND_URL}/api/user/stats`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to get user stats");
+  }
+
+  const data = await res.json();
+
+  return data;
+}
+
+export async function getUserActivities() {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const res = await fetch(`${BACKEND_URL}/api/user/activity`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to get user activity");
+  }
 
   const data = await res.json();
 

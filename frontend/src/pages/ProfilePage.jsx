@@ -1,6 +1,7 @@
 import Badge from "../components/Badge.jsx";
 import Button from "../components/Button.jsx";
 import Sidebar from "../components/Sidebar";
+import { Inbox } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/avatar";
 import { toast } from "sonner";
 import {
@@ -144,40 +145,54 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-
             <div className="lg:col-span-2">
               <div className="p-6 border bg-card border-border rounded-2xl card-elevated max-h-[39.5rem] flex flex-col">
                 <h3 className="mb-4 font-semibold">Историја на придонеси</h3>
                 <div className="pr-2 space-y-3 overflow-y-auto">
-                  {contributions.map((c, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-4 p-3 transition-colors rounded-lg hover:bg-muted/50"
-                    >
-                      <div className="p-2 rounded-lg bg-muted">
-                        <c.icon className="w-4 h-4 text-muted-foreground" />
+                  {contributions.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                      <div className="p-3 mb-3 rounded-full bg-muted">
+                        <Inbox className="w-5 h-5 text-muted-foreground" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
-                          {c.title}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {c.type} · {c.date}
-                        </p>
-                      </div>
-                      <Badge
-                        variant={
-                          c.status === "approved"
-                            ? "default"
-                            : c.status === "rejected"
-                              ? "destructive"
-                              : "secondary"
-                        }
-                      >
-                        {c.status}
-                      </Badge>
+                      <p className="text-sm font-medium">
+                        Нема придонеси сè уште
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Кога ќе започнеш да прикачуваш податоци, тука ќе се
+                        појави историјата на твоите придонеси.
+                      </p>
                     </div>
-                  ))}
+                  ) : (
+                    contributions.map((c, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-4 p-3 transition-colors rounded-lg hover:bg-muted/50"
+                      >
+                        <div className="p-2 rounded-lg bg-muted">
+                          <c.icon className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {c.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {c.type} · {c.date}
+                          </p>
+                        </div>
+                        <Badge
+                          variant={
+                            c.status === "approved"
+                              ? "default"
+                              : c.status === "rejected"
+                                ? "destructive"
+                                : "secondary"
+                          }
+                        >
+                          {c.status}
+                        </Badge>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
