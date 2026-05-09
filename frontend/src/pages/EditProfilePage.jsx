@@ -80,7 +80,7 @@ const EditProfilePage = () => {
   };
 
   const handleRemovePicture = async () => {
-    const data = await removeAvatarPicture();
+    await removeAvatarPicture();
     setUser(getUser());
   };
 

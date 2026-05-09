@@ -2,13 +2,13 @@ package mk.ukim.vezilka.backend.web.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import mk.ukim.vezilka.backend.model.Activity;
 import mk.ukim.vezilka.backend.model.AppUser;
 import mk.ukim.vezilka.backend.model.Content;
+import mk.ukim.vezilka.backend.service.ActivityService;
 import mk.ukim.vezilka.backend.service.UserService;
 import mk.ukim.vezilka.backend.web.request.EditUserRequest;
-import mk.ukim.vezilka.backend.web.response.AuthResponse;
-import mk.ukim.vezilka.backend.web.response.ContentResponse;
-import mk.ukim.vezilka.backend.web.response.UserResponse;
+import mk.ukim.vezilka.backend.web.response.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +21,11 @@ import java.util.List;
 @RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
+    private final ActivityService activityService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ActivityService activityService) {
         this.userService = userService;
+        this.activityService = activityService;
     }
 
     @GetMapping("/uploads")
@@ -40,6 +42,14 @@ public class UserController {
         AppUser user = userService.getUserByEmail(email);
 
         UserResponse response = new UserResponse(user);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<DashboardStatsResponse> getDashboardStas(Authentication authentication) {
+        String email = authentication.getName();
+        AppUser user = userService.getUserByEmail(email);
+        DashboardStatsResponse response = new DashboardStatsResponse(user);
         return ResponseEntity.ok(response);
     }
 
@@ -75,5 +85,16 @@ public class UserController {
         AppUser user = userService.removeAvatarPicture(email);
         UserResponse response = new UserResponse(user);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/activity")
+    public ResponseEntity<List<ActivityResponse>> getActivity(Authentication authentication,
+                                                              @RequestParam(value = "pageSize", defaultValue = "5") int pageSize) {
+        String email = authentication.getName();
+        AppUser user = userService.getUserByEmail(email);
+
+        List<Activity> activities = activityService.getActivitiesByUser(user, pageSize);
+        List<ActivityResponse> responses = activities.stream().map(ActivityResponse::new).toList();
+        return ResponseEntity.ok(responses);
     }
 }
