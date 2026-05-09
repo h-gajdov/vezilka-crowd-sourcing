@@ -10,9 +10,17 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
+import { clearAuth } from "../utils/auth";
+import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ activeButtonIndex = 0 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    clearAuth();
+    navigate("/");
+  };
 
   return (
     <aside
@@ -96,8 +104,9 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
         </nav>
 
         <button
-          className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted"
+          className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted cursor-pointer"
           title={collapsed ? "Одјави се" : undefined}
+          onClick={handleLogout}
         >
           <LogOut className="w-4 h-4 shrink-0" />
           <span

@@ -13,11 +13,14 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String SECRET;
 
-    public String generateToken(String username) {
+    @Value("${application.security.jwt.expiration}")
+    private int EXPIRATION;
+
+    public String generateToken(String email) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(Keys.hmacShaKeyFor(SECRET.getBytes()))
                 .compact();
     }

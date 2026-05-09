@@ -6,6 +6,7 @@ import mk.ukim.vezilka.backend.model.exceptions.UserAlreadyExistsException;
 import mk.ukim.vezilka.backend.model.exceptions.UserNotFoundException;
 import mk.ukim.vezilka.backend.repository.AppUserRepository;
 import mk.ukim.vezilka.backend.service.AuthService;
+import mk.ukim.vezilka.backend.service.UserService;
 import mk.ukim.vezilka.backend.util.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,11 +17,13 @@ import java.util.Optional;
 @Service
 public class AuthServiceImpl implements AuthService {
     private final AppUserRepository appUserRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(AppUserRepository appUserRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public AuthServiceImpl(AppUserRepository appUserRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, UserService userService) {
         this.appUserRepository = appUserRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
     @Override
@@ -43,11 +46,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AppUser login(String email, String password) {
-        Optional<AppUser> userOptional = appUserRepository.findByEmail(email);
-        if(userOptional.isEmpty())
-            throw new UserNotFoundException(email);
-
-        AppUser user = userOptional.get();
+        AppUser user = userService.getUserByEmail(email);
         if(!passwordEncoder.matches(password, user.getPassword()))
             throw new InvalidCredentialsException();
 

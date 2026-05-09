@@ -1,6 +1,7 @@
 import Badge from "../components/Badge.jsx";
 import Button from "../components/Button.jsx";
 import Sidebar from "../components/Sidebar";
+import { toast } from "sonner";
 import {
   User,
   Mail,
@@ -12,46 +13,62 @@ import {
   FileText,
   Mic,
   Video,
+  Image,
 } from "lucide-react";
+import { getUser } from "../utils/auth.js";
+import { getMonthInMacedonian } from "../utils/dateFormatter.js";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/Dialog.jsx";
+import { Input } from "../components/Input.jsx";
+import { getUserUploads } from "../api/userApi.js";
+import { useEffect, useState } from "react";
+
+const typeIcons = {
+  TEXT: FileText,
+  AUDIO: Mic,
+  VIDEO: Video,
+  IMAGE: Image,
+};
 
 export default function ProfilePage() {
+  const user = getUser();
   const badges = [
     { key: "firstUpload", icon: Upload, earned: true },
     { key: "reviewer", icon: CheckSquare, earned: true },
     { key: "hundredPoints", icon: Star, earned: true },
     { key: "topContributor", icon: Award, earned: false },
   ];
+  const [contributions, setContributions] = useState([]);
 
-  const contributions = [
-    {
-      type: "Text",
-      title: "Народна приказна",
-      date: "Apr 12, 2026",
-      status: "approved",
-      icon: FileText,
-    },
-    {
-      type: "Audio",
-      title: "Разговор за времето",
-      date: "Apr 10, 2026",
-      status: "pending",
-      icon: Mic,
-    },
-    {
-      type: "Video",
-      title: "Кратко интервју",
-      date: "Apr 8, 2026",
-      status: "approved",
-      icon: Video,
-    },
-    {
-      type: "Text",
-      title: "Рецепт за тавче гравче",
-      date: "Apr 5, 2026",
-      status: "approved",
-      icon: FileText,
-    },
-  ];
+  useEffect(() => {
+    getUserUploads()
+      .then((data) => {
+        const mapped = data.map((upload) => ({
+          type: upload.type[0] + upload.type.slice(1).toLowerCase(),
+          title:
+            upload.topic?.trim() || upload.description?.trim() || "Без наслов",
+          date: new Date(upload.createdAt).toLocaleDateString("mk-MK", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+          status: upload.status.toLowerCase(),
+          icon: typeIcons[upload.type] || FileText,
+        }));
+
+        setContributions(mapped);
+      })
+      .catch(() =>
+        toast.error("Не успеавме да ја вчитаме историјата на придонеси!"),
+      );
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -68,7 +85,9 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-center w-20 h-20 mx-auto mb-4 rounded-full bg-primary/10 text-primary">
                   <User className="w-10 h-10" />
                 </div>
-                <h2 className="text-xl font-bold">Марко Петров</h2>
+                <h2 className="text-xl font-bold">
+                  {user.firstName} {user.lastName}
+                </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Придонесувач
                 </p>
@@ -76,11 +95,14 @@ export default function ProfilePage() {
                 <div className="mt-6 space-y-3 text-left">
                   <div className="flex items-center gap-3 text-sm">
                     <Mail className="w-4 h-4 text-muted-foreground" />
-                    <span>marko.petrov@example.com</span>
+                    <span>{user.email}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <span>Се придружи во март 2026</span>
+                    <span>
+                      Се придружи во {getMonthInMacedonian(user.createdAt)}{" "}
+                      {user.createdAt.getFullYear()}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Star className="w-4 h-4 text-warning" />
@@ -88,7 +110,11 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <Button variant="outline" className="w-full mt-6">
+                <Button
+                  variant="outline"
+                  className="w-full mt-6"
+                  to="/profile/edit"
+                >
                   Уреди профил
                 </Button>
               </div>
@@ -112,9 +138,9 @@ export default function ProfilePage() {
             </div>
 
             <div className="lg:col-span-2">
-              <div className="p-6 border bg-card border-border rounded-2xl card-elevated">
+              <div className="p-6 border bg-card border-border rounded-2xl card-elevated max-h-[39.5rem] flex flex-col">
                 <h3 className="mb-4 font-semibold">Историја на придонеси</h3>
-                <div className="space-y-3">
+                <div className="pr-2 space-y-3 overflow-y-auto">
                   {contributions.map((c, i) => (
                     <div
                       key={i}
@@ -133,7 +159,11 @@ export default function ProfilePage() {
                       </div>
                       <Badge
                         variant={
-                          c.status === "approved" ? "default" : "secondary"
+                          c.status === "approved"
+                            ? "default"
+                            : c.status === "rejected"
+                              ? "destructive"
+                              : "secondary"
                         }
                       >
                         {c.status}

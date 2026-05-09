@@ -1,6 +1,7 @@
 import { ArrowRight, Lock, Mail, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { saveAuth } from "../utils/auth";
 
 export default function LoginPage() {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -44,7 +45,7 @@ export default function LoginPage() {
       }
 
       const data = await res.json();
-      console.log("Logged in:", data);
+      saveAuth(data);
       navigate("/dashboard");
     } catch (err) {
       console.error(err.message);
@@ -112,7 +113,7 @@ export default function LoginPage() {
               </div>
             )}
             <button
-              className="inline-flex mt-5 items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-xl px-8 w-full gap-2"
+              className="inline-flex mt-5 items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-xl px-8 w-full gap-2 cursor-pointer"
               type="submit"
             >
               Најави се <ArrowRight className="w-4 h-4"></ArrowRight>
