@@ -10,6 +10,8 @@ import mk.ukim.vezilka.backend.web.response.AuthResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -26,7 +28,13 @@ public class AuthController {
         try {
             AppUser user = authService.register(request.getFirstName(), request.getLastName(), request.getEmail(), request.getPassword());
             String jwtToken = jwtUtil.generateToken(user.getEmail());
-            AuthResponse response = new AuthResponse(jwtToken, user.getFirstName(), user.getLastName(), user.getEmail());
+            AuthResponse response = new AuthResponse(
+                    jwtToken,
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getEmail(),
+                    LocalDateTime.now()
+            );
             return ResponseEntity.ok(response);
         } catch (UserAlreadyExistsException ex) {
             return ResponseEntity.status(409).build();
@@ -40,7 +48,13 @@ public class AuthController {
         try {
             AppUser user = authService.login(request.getEmail(), request.getPassword());
             String jwtToken = jwtUtil.generateToken(user.getEmail());
-            AuthResponse response = new AuthResponse(jwtToken, user.getFirstName(), user.getLastName(), user.getEmail());
+            AuthResponse response = new AuthResponse(
+                    jwtToken,
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getEmail(),
+                    user.getCreatedAt()
+            );
             return ResponseEntity.ok(response);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().build();

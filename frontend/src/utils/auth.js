@@ -6,14 +6,28 @@ export const saveAuth = (authResponse) => {
     firstName: authResponse.firstName,
     lastName: authResponse.lastName,
     email: authResponse.email,
+    createdAt: authResponse.createdAt
   }));
 };
+
+export const updateUserData = (userDetailsResponse) => {
+    localStorage.setItem('user', JSON.stringify({
+        firstName: userDetailsResponse.firstName,
+        lastName: userDetailsResponse.lastName,
+        email: userDetailsResponse.email,
+        createdAt: userDetailsResponse.createdAt
+    }));
+}
 
 export const getToken = () => localStorage.getItem('token');
 
 export const getUser = () => {
   const user = localStorage.getItem('user');
-  return user ? JSON.parse(user) : null;
+  if(!user) return null;
+
+  const result = JSON.parse(user);
+  result.createdAt = new Date(result.createdAt);
+  return result;
 };
 
 export const clearAuth = () => {
@@ -30,12 +44,10 @@ export const isLoggedIn = () => {
 export function isTokenExpired() {
   try {
     const token = getToken();
-    
+
     if (!token) return true;
 
     const decoded = jwtDecode(token);
-
-    console.log(decoded.exp * 1000)
 
     return decoded.exp * 1000 < Date.now();
   } catch (error) {

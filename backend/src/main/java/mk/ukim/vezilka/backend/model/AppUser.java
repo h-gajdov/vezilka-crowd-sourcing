@@ -22,6 +22,10 @@ public class AppUser {
     private String firstName;
     private String lastName;
 
+    private String phoneNumber;
+    private String location;
+    private String biography;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 

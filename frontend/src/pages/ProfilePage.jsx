@@ -13,8 +13,21 @@ import {
   Mic,
   Video,
 } from "lucide-react";
+import { getUser } from "../utils/auth.js";
+import { getMonthInMacedonian } from "../utils/dateFormatter.js";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/Dialog.jsx";
+import { Input } from "../components/Input.jsx";
 
 export default function ProfilePage() {
+  const user = getUser();
   const badges = [
     { key: "firstUpload", icon: Upload, earned: true },
     { key: "reviewer", icon: CheckSquare, earned: true },
@@ -68,7 +81,9 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-center w-20 h-20 mx-auto mb-4 rounded-full bg-primary/10 text-primary">
                   <User className="w-10 h-10" />
                 </div>
-                <h2 className="text-xl font-bold">Марко Петров</h2>
+                <h2 className="text-xl font-bold">
+                  {user.firstName} {user.lastName}
+                </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Придонесувач
                 </p>
@@ -76,11 +91,14 @@ export default function ProfilePage() {
                 <div className="mt-6 space-y-3 text-left">
                   <div className="flex items-center gap-3 text-sm">
                     <Mail className="w-4 h-4 text-muted-foreground" />
-                    <span>marko.petrov@example.com</span>
+                    <span>{user.email}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <span>Се придружи во март 2026</span>
+                    <span>
+                      Се придружи во {getMonthInMacedonian(user.createdAt)}{" "}
+                      {user.createdAt.getFullYear()}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Star className="w-4 h-4 text-warning" />
@@ -88,7 +106,11 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <Button variant="outline" className="w-full mt-6">
+                <Button
+                  variant="outline"
+                  className="w-full mt-6"
+                  to="/profile/edit"
+                >
                   Уреди профил
                 </Button>
               </div>

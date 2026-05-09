@@ -1,6 +1,7 @@
 import { ArrowRight, Lock, Mail, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { saveAuth } from "../utils/auth";
 
 export default function RegisterPage() {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -49,15 +50,7 @@ export default function RegisterPage() {
       }
 
       const data = await res.json();
-      localStorage.setItem("token", data.jwtToken);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-        }),
-      );
+      saveAuth(data);
       navigate("/dashboard");
     } catch (err) {
       console.error(err.message);

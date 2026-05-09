@@ -1,10 +1,25 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Button = React.forwardRef(
   (
-    { className = "", variant = "default", size = "default", ...props },
+    {
+      className = "",
+      variant = "default",
+      size = "default",
+      onClick = () => {},
+      to = "",
+      ...props
+    },
     ref,
   ) => {
+    const navigate = useNavigate();
+
+    const handleClick = (e) => {
+      if (onClick) onClick(e);
+      if (to) navigate(to);
+    };
+
     // 1. Base styles
     const baseStyles =
       "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer";
@@ -38,7 +53,14 @@ const Button = React.forwardRef(
       .filter(Boolean)
       .join(" ");
 
-    return <button ref={ref} className={combinedClasses} {...props} />;
+    return (
+      <button
+        ref={ref}
+        className={combinedClasses}
+        onClick={handleClick}
+        {...props}
+      />
+    );
   },
 );
 
