@@ -19,7 +19,8 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
             "LOWER(c.topic) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(c.description) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(c.originalFileName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            "LOWER(d.name) LIKE LOWER(CONCAT('%', :search, '%')))")
+            "LOWER(d.name) LIKE LOWER(CONCAT('%', :search, '%')))" +
+            "ORDER BY c.createdAt DESC ")
     Page<Content> getAllByIsPrivateIsFalse(@Param("search") String search, Pageable pageable);
 
     Optional<Content> getContentById(Long id);
