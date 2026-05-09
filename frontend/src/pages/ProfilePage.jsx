@@ -1,6 +1,7 @@
 import Badge from "../components/Badge.jsx";
 import Button from "../components/Button.jsx";
 import Sidebar from "../components/Sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/avatar";
 import { toast } from "sonner";
 import {
   User,
@@ -83,7 +84,14 @@ export default function ProfilePage() {
             <div className="lg:col-span-1">
               <div className="p-6 text-center border bg-card border-border rounded-2xl card-elevated">
                 <div className="flex items-center justify-center w-20 h-20 mx-auto mb-4 rounded-full bg-primary/10 text-primary">
-                  <User className="w-10 h-10" />
+                  <Avatar className="w-24 h-24">
+                    {user.avatarUrl ? (
+                      <AvatarImage src={user.avatarUrl} alt="avatar" />
+                    ) : null}
+                    <AvatarFallback className="text-xl bg-primary/10 text-primary">
+                      {<User className="w-10 h-10" />}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 <h2 className="text-xl font-bold">
                   {user.firstName} {user.lastName}
