@@ -6,5 +6,5 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface FileManagementService {
-    Content uploadFile(String topic, String description, Long dialectId, MultipartFile file, String userEmail) throws IOException;
+    Content uploadFile(String topic, String description, String transcription, boolean isPrivate, Long dialectId, MultipartFile file, String userEmail) throws IOException;
 }

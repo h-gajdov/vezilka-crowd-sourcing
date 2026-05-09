@@ -2,10 +2,12 @@ package mk.ukim.vezilka.backend.service.impl;
 
 import mk.ukim.vezilka.backend.model.AppUser;
 import mk.ukim.vezilka.backend.model.Content;
+import mk.ukim.vezilka.backend.model.Transcription;
 import mk.ukim.vezilka.backend.model.enums.ContentType;
 import mk.ukim.vezilka.backend.model.exceptions.InvalidFileException;
 import mk.ukim.vezilka.backend.repository.ContentRepository;
 import mk.ukim.vezilka.backend.service.FileManagementService;
+import mk.ukim.vezilka.backend.service.TranscriptionService;
 import mk.ukim.vezilka.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,22 +26,35 @@ import java.util.UUID;
 public class FileManagementServiceImpl implements FileManagementService {
     private final ContentRepository contentRepository;
     private final UserService userService;
+    private final TranscriptionService transcriptionService;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    public FileManagementServiceImpl(ContentRepository contentRepository, UserService userService) {
+    public FileManagementServiceImpl(ContentRepository contentRepository, UserService userService, TranscriptionService transcriptionService) {
         this.contentRepository = contentRepository;
         this.userService = userService;
+        this.transcriptionService = transcriptionService;
     }
 
-    private Content createContentEntity(ContentType type, String fileUrl, String topic, Long dialectId, String description, AppUser user) {
-        Content content = new Content(type, fileUrl, topic, null, description, user);
-        return contentRepository.save(content);
+    private Content createContentEntity(ContentType type, String fileUrl, String topic, Long dialectId, String description, String transcription, boolean isPrivate, AppUser user) {
+        Content content = new Content(type, fileUrl, topic, null, description, isPrivate, user);
+        content = contentRepository.save(content);
+
+        if (transcription != null && !transcription.isEmpty()) {
+            Transcription subs = new Transcription(content, transcription);
+
+            subs = transcriptionService.saveTranscription(subs);
+
+            content.setTranscription(subs);
+            content = contentRepository.save(content);
+        }
+
+        return content;
     }
 
     @Override
-    public Content uploadFile(String topic, String description, Long dialectId, MultipartFile file, String userEmail) throws IOException {
+    public Content uploadFile(String topic, String description, String transcription, boolean isPrivate, Long dialectId, MultipartFile file, String userEmail) throws IOException {
         if (file.isEmpty()) {
             throw new InvalidFileException();
         }
@@ -58,7 +73,7 @@ public class FileManagementServiceImpl implements FileManagementService {
         Path targetLocation = userStoragePath.resolve(finalFilename);
         file.transferTo(targetLocation);
 
-        return createContentEntity(contentType, targetLocation.toString(), topic, dialectId, description, user);
+        return createContentEntity(contentType, targetLocation.toString(), topic, dialectId, description, transcription, isPrivate, user);
     }
 
     private ContentType determineContentType(String mimeType) {

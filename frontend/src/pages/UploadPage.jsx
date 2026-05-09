@@ -1,5 +1,16 @@
 import { useState, useRef, useCallback } from "react";
-import { FileText, Upload, Video, Mic, Image, X } from "lucide-react";
+import {
+  FileText,
+  Upload,
+  Video,
+  Mic,
+  Image,
+  X,
+  Lock,
+  Globe,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import DialectDropdown from "../components/DialectDropdown";
 import UploadEntry from "../components/UploadEntry";
@@ -18,19 +29,44 @@ const ACCEPTED_TYPES = [
   ".txt",
 ];
 
+const AUDIO_VIDEO_MIME_PREFIXES = ["audio/", "video/"];
+const AUDIO_VIDEO_EXTENSIONS = [
+  ".mp3",
+  ".wav",
+  ".ogg",
+  ".flac",
+  ".aac",
+  ".m4a",
+  ".mp4",
+  ".mov",
+  ".avi",
+  ".mkv",
+  ".webm",
+  ".wmv",
+];
+
+function isAudioOrVideo(file) {
+  if (AUDIO_VIDEO_MIME_PREFIXES.some((prefix) => file.type.startsWith(prefix)))
+    return true;
+  const ext = "." + file.name.split(".").pop().toLowerCase();
+  return AUDIO_VIDEO_EXTENSIONS.includes(ext);
+}
+
 function generateId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 async function fileUpload(
   file,
-  { dialect, topic, description, token },
+  { dialect, topic, description, isPrivate, transcription, token },
   onProgress,
 ) {
   const formData = new FormData();
   formData.append("topic", topic);
   formData.append("description", description);
   formData.append("file", file);
+  formData.append("privateContent", String(isPrivate));
+  if (transcription) formData.append("transcription", transcription);
 
   const res = await fetch(`${BACKEND_URL}/api/files/upload`, {
     method: "POST",
@@ -49,6 +85,8 @@ export default function UploadPage() {
   const [dialect, setDialect] = useState("");
   const [topic, setTopic] = useState("");
   const [description, setDescription] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
+  // Each entry: { id, file, transcription, transcriptionOpen }
   const [stagedFiles, setStagedFiles] = useState([]);
   const [entries, setEntries] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -64,7 +102,12 @@ export default function UploadPage() {
   const addStagedFiles = (files) => {
     setStagedFiles((prev) => [
       ...prev,
-      ...files.map((f) => ({ id: generateId(), file: f })),
+      ...files.map((f) => ({
+        id: generateId(),
+        file: f,
+        transcription: "",
+        transcriptionOpen: true,
+      })),
     ]);
   };
 
@@ -85,16 +128,23 @@ export default function UploadPage() {
     setStagedFiles((prev) => prev.filter((f) => f.id !== id));
   };
 
+  const updateStagedFile = (id, patch) => {
+    setStagedFiles((prev) =>
+      prev.map((f) => (f.id === id ? { ...f, ...patch } : f)),
+    );
+  };
+
   const handleSubmit = async () => {
     if (!stagedFiles.length) return;
 
-    // Move all staged files into the entries list with status uploading
-    const newEntries = stagedFiles.map(({ id, file }) => ({
+    const newEntries = stagedFiles.map(({ id, file, transcription }) => ({
       id,
       file,
       dialect,
       topic,
       description,
+      isPrivate,
+      transcription: isAudioOrVideo(file) ? transcription : "",
       status: "uploading",
       progress: 0,
     }));
@@ -107,7 +157,14 @@ export default function UploadPage() {
         try {
           await fileUpload(
             entry.file,
-            { dialect, topic, description, token },
+            {
+              dialect,
+              topic,
+              description,
+              isPrivate,
+              transcription: entry.transcription,
+              token,
+            },
             (progress) => {
               setEntries((prev) =>
                 prev.map((e) => (e.id === entry.id ? { ...e, progress } : e)),
@@ -148,6 +205,7 @@ export default function UploadPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            {/* Left column — drop zone + staged files */}
             <div className="space-y-4">
               <div
                 role="button"
@@ -205,32 +263,109 @@ export default function UploadPage() {
               />
 
               {stagedFiles.length > 0 && (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <p className="text-sm font-medium text-muted-foreground">
                     Избрани датотеки ({stagedFiles.length})
                   </p>
-                  {stagedFiles.map(({ id, file }) => (
-                    <div
-                      key={id}
-                      className="flex items-center gap-3 px-3 py-2 border rounded-lg border-border bg-muted/40"
-                    >
-                      <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                      <span className="flex-1 text-sm truncate">
-                        {file.name}
-                      </span>
-                      <button
-                        onClick={() => removeStagedFile(id)}
-                        className="p-0.5 rounded text-muted-foreground hover:text-destructive transition-colors"
-                        aria-label="Отстрани"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
+
+                  {stagedFiles.map(
+                    ({ id, file, transcription, transcriptionOpen }) => {
+                      const isMedia = isAudioOrVideo(file);
+                      const isVideo = file.type.startsWith("video/");
+
+                      return (
+                        <div
+                          key={id}
+                          className="overflow-hidden border rounded-lg border-border bg-muted/40"
+                        >
+                          {/* File row */}
+                          <div className="flex items-center gap-3 px-3 py-2">
+                            {isMedia ? (
+                              isVideo ? (
+                                <Video className="w-4 h-4 text-muted-foreground shrink-0" />
+                              ) : (
+                                <Mic className="w-4 h-4 text-muted-foreground shrink-0" />
+                              )
+                            ) : (
+                              <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
+                            )}
+                            <span className="flex-1 text-sm truncate">
+                              {file.name}
+                            </span>
+
+                            {/* Transcription toggle — only for audio/video */}
+                            {isMedia && (
+                              <button
+                                onClick={() =>
+                                  updateStagedFile(id, {
+                                    transcriptionOpen: !transcriptionOpen,
+                                  })
+                                }
+                                className="flex items-center gap-1 px-2 py-0.5 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                                aria-expanded={transcriptionOpen}
+                                aria-label="Транскрипција"
+                              >
+                                <ChevronDown
+                                  className="w-3.5 h-3.5 transition-transform duration-200"
+                                  style={{
+                                    transform: transcriptionOpen
+                                      ? "rotate(0deg)"
+                                      : "rotate(-90deg)",
+                                  }}
+                                />
+                                Транскрипција
+                                {transcription && !transcriptionOpen && (
+                                  <span className="ml-1 w-1.5 h-1.5 rounded-full bg-primary inline-block" />
+                                )}
+                              </button>
+                            )}
+
+                            <button
+                              onClick={() => removeStagedFile(id)}
+                              className="p-0.5 rounded text-muted-foreground hover:text-destructive transition-colors"
+                              aria-label="Отстрани"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+
+                          {/* Collapsible transcription panel — always rendered, animated via max-height */}
+                          {isMedia && (
+                            <div
+                              style={{
+                                display: "grid",
+                                gridTemplateRows: transcriptionOpen
+                                  ? "1fr"
+                                  : "0fr",
+                                transition: "grid-template-rows 200ms ease",
+                              }}
+                            >
+                              <div className="overflow-hidden">
+                                <div className="px-3 pt-1 pb-3">
+                                  <textarea
+                                    value={transcription}
+                                    onChange={(e) =>
+                                      updateStagedFile(id, {
+                                        transcription: e.target.value,
+                                      })
+                                    }
+                                    className="flex w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                                    placeholder="пр. Добредојдовте на денешната емисија..."
+                                    rows={3}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    },
+                  )}
                 </div>
               )}
             </div>
 
+            {/* Right column — metadata + visibility */}
             <div className="space-y-5">
               <DialectDropdown value={dialect} onChange={setDialect} />
 
@@ -253,6 +388,37 @@ export default function UploadPage() {
                   placeholder="Накратко опиши ја содржината..."
                   rows={4}
                 />
+              </div>
+
+              {/* Privacy toggle */}
+              <div className="flex items-start gap-3 p-4 border rounded-xl border-border bg-muted/30">
+                <div className="flex items-center h-5 mt-0.5">
+                  <input
+                    id="privacy-toggle"
+                    type="checkbox"
+                    checked={isPrivate}
+                    onChange={(e) => setIsPrivate(e.target.checked)}
+                    className="w-4 h-4 rounded cursor-pointer border-input accent-primary"
+                  />
+                </div>
+                <label
+                  htmlFor="privacy-toggle"
+                  className="cursor-pointer select-none"
+                >
+                  <span className="flex items-center gap-1.5 text-sm font-medium leading-none mb-1">
+                    {isPrivate ? (
+                      <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+                    ) : (
+                      <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+                    )}
+                    {isPrivate ? "Приватно" : "Јавно"}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {isPrivate
+                      ? "Само ти ќе можеш да ја видиш оваа содржина"
+                      : "Содржината ќе биде достапна за сите корисници"}
+                  </span>
+                </label>
               </div>
 
               <button

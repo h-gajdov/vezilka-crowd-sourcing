@@ -1,5 +1,6 @@
 package mk.ukim.vezilka.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,10 +37,15 @@ public class Content {
 
     private LocalDateTime createdAt;
 
+    @OneToOne(mappedBy = "content")
+    private Transcription transcription;
+
+    private boolean isPrivate;
+
     @ManyToOne
     private AppUser uploader;
 
-    public Content(ContentType type, String fileUrl, String topic, Dialect dialect, String description, AppUser uploader) {
+    public Content(ContentType type, String fileUrl, String topic, Dialect dialect, String description, boolean isPrivate, AppUser uploader) {
         this.type = type;
         this.fileUrl = fileUrl;
         this.topic = topic;
@@ -47,6 +53,7 @@ public class Content {
         this.description = description;
         this.status = ContentStatus.PENDING;
         this.qualityScore = 0;
+        this.isPrivate = isPrivate;
         this.createdAt = LocalDateTime.now();
         this.uploader = uploader;
     }
