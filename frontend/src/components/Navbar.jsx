@@ -1,11 +1,29 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import { Menu, X } from "lucide-react";
-// import LanguageToggle from "../components/LanguageToggle";
 
 export default function Navbar() {
     const [open, setOpen] = useState(false);
+
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleScrollNavigation = (sectionId) => {
+        setOpen(false);
+
+        if (location.pathname === "/") {
+            const element = document.getElementById(sectionId);
+
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
+            }
+
+            return;
+        }
+
+        navigate(`/#${sectionId}`);
+    };
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -15,17 +33,37 @@ export default function Navbar() {
                 </NavLink>
 
                 <div className="hidden md:flex items-center gap-6">
-                    <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <button
+                        onClick={() => handleScrollNavigation("how-it-works")}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
                         Како функционира
-                    </a>
-                    <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    </button>
+
+                    <button
+                        onClick={() => handleScrollNavigation("features")}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
                         Можности
-                    </a>
-                    <NavLink to="/login">
-                        <Button variant="ghost" size="sm">Најава</Button>
+                    </button>
+
+                    <NavLink
+                        to="/public-files"
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        Податоци
                     </NavLink>
+
+                    <NavLink to="/login">
+                        <Button variant="ghost" size="sm">
+                            Најава
+                        </Button>
+                    </NavLink>
+
                     <NavLink to="/register">
-                        <Button size="sm">Започни</Button>
+                        <Button size="sm">
+                            Започни
+                        </Button>
                     </NavLink>
                 </div>
 
@@ -38,17 +76,41 @@ export default function Navbar() {
 
             {open && (
                 <div className="md:hidden border-t border-border bg-background p-4 space-y-3 animate-fade-in">
-                    <a href="#how-it-works" className="block text-sm text-muted-foreground" onClick={() => setOpen(false)}>Како функционира</a>
-                    <a href="#features" className="block text-sm text-muted-foreground" onClick={() => setOpen(false)}>Можности</a>
-                    <NavLink to="/login" onClick={() => setOpen(false)}>
-                        <Button variant="ghost" size="sm" className="w-full">Најава</Button>
+                    <button
+                        onClick={() => handleScrollNavigation("how-it-works")}
+                        className="block text-sm text-muted-foreground"
+                    >
+                        Како функционира
+                    </button>
+
+                    <button
+                        onClick={() => handleScrollNavigation("features")}
+                        className="block text-sm text-muted-foreground"
+                    >
+                        Можности
+                    </button>
+
+                    <NavLink
+                        to="/public-files"
+                        className="block text-sm text-muted-foreground"
+                        onClick={() => setOpen(false)}
+                    >
+                        Податоци
                     </NavLink>
+
+                    <NavLink to="/login" onClick={() => setOpen(false)}>
+                        <Button variant="ghost" size="sm" className="w-full">
+                            Најава
+                        </Button>
+                    </NavLink>
+
                     <NavLink to="/register" onClick={() => setOpen(false)}>
-                        <Button size="sm" className="w-full">Започни</Button>
+                        <Button size="sm" className="w-full">
+                            Започни
+                        </Button>
                     </NavLink>
                 </div>
             )}
         </nav>
     );
-};
-
+}

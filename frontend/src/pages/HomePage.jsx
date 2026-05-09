@@ -2,10 +2,25 @@ import Navbar from "../components/Navbar.jsx";
 import {ArrowRight, Sparkles, Upload, CheckCircle, Star, Gift} from "lucide-react";
 import {motion} from "framer-motion";
 import Button from "../components/Button.jsx";
-import {NavLink} from "react-router-dom";
+import {NavLink, useLocation} from "react-router-dom";
 import { FileText, Mic, Video, Shield, Users, Trophy } from "lucide-react";
+import {useEffect} from "react";
 
 export default function HomePage() {
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.hash) {
+            const element = document.getElementById(location.hash.replace("#", ""));
+
+            if (element) {
+                setTimeout(() => {
+                    element.scrollIntoView({ behavior: "smooth" });
+                }, 100);
+            }
+        }
+    }, [location]);
+
     return (
         <>
             <Navbar/>
