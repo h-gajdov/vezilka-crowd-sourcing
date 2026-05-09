@@ -26,6 +26,7 @@ public class AppUser {
     private String phoneNumber;
     private String location;
     private String biography;
+    private String avatarUrl;
 
     @Enumerated(EnumType.STRING)
     private Role role;

@@ -18,6 +18,7 @@ public class UserResponse {
     private String phoneNumber;
     private String location;
     private String biography;
+    private String avatarUrl;
 
     public UserResponse(AppUser user) {
         this.firstName = user.getFirstName();
@@ -27,5 +28,6 @@ public class UserResponse {
         this.phoneNumber = user.getPhoneNumber();
         this.location = user.getLocation();
         this.biography = user.getBiography();
+        this.avatarUrl = user.getAvatarUrl();
     }
 }

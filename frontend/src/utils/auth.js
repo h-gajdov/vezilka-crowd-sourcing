@@ -1,22 +1,37 @@
 import { jwtDecode } from "jwt-decode";
 
 export const saveAuth = (authResponse) => {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const avatarUrl = (authResponse.avatarUrl) ? `${BACKEND_URL}/${authResponse.avatarUrl}` : null;
   localStorage.setItem('token', authResponse.jwtToken);
   localStorage.setItem('user', JSON.stringify({
     firstName: authResponse.firstName,
     lastName: authResponse.lastName,
     email: authResponse.email,
+    avatarUrl: avatarUrl,
     createdAt: authResponse.createdAt
   }));
 };
 
-export const updateUserData = (userDetailsResponse) => {
-    localStorage.setItem('user', JSON.stringify({
-        firstName: userDetailsResponse.firstName,
-        lastName: userDetailsResponse.lastName,
-        email: userDetailsResponse.email,
-        createdAt: userDetailsResponse.createdAt
-    }));
+export const refreshUserObj = async () => {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const res = await fetch(`${BACKEND_URL}/api/auth`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to refresh user");
+  }
+
+  const data = await res.json();
+
+  saveAuth(data);
+  return data;
 }
 
 export const getToken = () => localStorage.getItem('token');

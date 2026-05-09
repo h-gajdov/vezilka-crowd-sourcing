@@ -10,12 +10,17 @@ import { Textarea } from "../components/textarea";
 import { Switch } from "../components/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/tabs";
 import { toast } from "sonner";
-import { getUser, updateUserData } from "../utils/auth";
-import { editUser, getUserDetails } from "../api/userApi";
+import { getUser, refreshUserObj } from "../utils/auth";
+import {
+  editAvatarPicture,
+  editUser,
+  getUserDetails,
+  removeAvatarPicture,
+} from "../api/userApi";
 
 const EditProfilePage = () => {
   //   const { user, updateProfile } = useAuth();
-  const user = getUser();
+  const [user, setUser] = useState(getUser());
   const fileInputRef = useRef(null);
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,7 +46,7 @@ const EditProfilePage = () => {
 
       toast.success("Профилот е ажуриран");
 
-      updateUserData(updated);
+      setUser(getUser());
 
       setFirstName(updated.firstName);
       setLastName(updated.lastName);
@@ -53,23 +58,30 @@ const EditProfilePage = () => {
     }
   };
 
-  const handlePicture = (e) => {
+  const handlePicture = async (e) => {
     const file = e.target.files?.[0];
+
     if (!file) return;
+
     if (file.size > 2 * 1024 * 1024) {
       toast.error("Максимум 2MB слика!");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      //   updateProfile({ avatarUrl: reader.result });
+
+    try {
+      await editAvatarPicture(file);
+
+      setUser(getUser());
+
       toast.success("Профилот е ажуриран");
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      toast.error("Не успеавме да ја ажурираме сликата!");
+    }
   };
 
-  const handleRemovePicture = () => {
-    // updateProfile({ avatarUrl: undefined });
+  const handleRemovePicture = async () => {
+    const data = await removeAvatarPicture();
+    setUser(getUser());
   };
 
   useEffect(() => {
@@ -195,12 +207,15 @@ const EditProfilePage = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-6">
-                  <Avatar className="w-24 h-24">
+                  <Avatar
+                    key={user.avatarUrl ?? "no-avatar"}
+                    className="w-24 h-24"
+                  >
                     {user.avatarUrl ? (
-                      <AvatarImage src={user.avatarUrl} alt={user.name} />
+                      <AvatarImage src={user.avatarUrl} alt={initials} />
                     ) : null}
-                    <AvatarFallback className="text-xl">
-                      {initials || <User className="w-8 h-8" />}
+                    <AvatarFallback className="text-xl bg-primary/10 text-primary">
+                      <User className="w-10 h-10" />
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col gap-2 sm:flex-row">

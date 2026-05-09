@@ -2,17 +2,29 @@ package mk.ukim.vezilka.backend.service.impl;
 
 import mk.ukim.vezilka.backend.model.AppUser;
 import mk.ukim.vezilka.backend.model.Content;
+import mk.ukim.vezilka.backend.model.exceptions.InvalidFileException;
 import mk.ukim.vezilka.backend.model.exceptions.UserNotFoundException;
 import mk.ukim.vezilka.backend.repository.AppUserRepository;
 import mk.ukim.vezilka.backend.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final AppUserRepository appUserRepository;
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     public UserServiceImpl(AppUserRepository appUserRepository) {
         this.appUserRepository = appUserRepository;
@@ -35,8 +47,44 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public AppUser editAvatarPicture(String email, MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new InvalidFileException();
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new InvalidFileException();
+        }
+
+        AppUser user = getUserByEmail(email);
+        String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+        String finalFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+
+        Path userStoragePath = Paths.get(uploadDir)
+                .resolve("users")
+                .resolve(String.valueOf(user.getId()))
+                .resolve("profile");
+        Files.createDirectories(userStoragePath);
+
+        Path targetLocation = userStoragePath.resolve(finalFilename);
+        file.transferTo(targetLocation);
+
+        user.setAvatarUrl(targetLocation.toString());
+
+        return appUserRepository.save(user);
+    }
+
+    @Override
     public List<Content> getUploadsByUser(String email) {
         AppUser user = getUserByEmail(email);
         return user.getUploads();
+    }
+
+    @Override
+    public AppUser removeAvatarPicture(String email) {
+        AppUser user = getUserByEmail(email);
+        user.setAvatarUrl(null);
+        return appUserRepository.save(user);
     }
 }

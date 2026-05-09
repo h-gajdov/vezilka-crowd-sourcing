@@ -1,6 +1,7 @@
 package mk.ukim.vezilka.backend.web.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import mk.ukim.vezilka.backend.model.AppUser;
 import mk.ukim.vezilka.backend.model.Content;
 import mk.ukim.vezilka.backend.service.UserService;
@@ -11,7 +12,9 @@ import mk.ukim.vezilka.backend.web.response.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -53,6 +56,23 @@ public class UserController {
                 request.getBiography()
         );
 
+        UserResponse response = new UserResponse(user);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/avatar")
+    public ResponseEntity<UserResponse> setAvatarPicture(Authentication authentication,
+                                                         @RequestParam("file") MultipartFile file) throws IOException {
+        String email = authentication.getName();
+        AppUser user =  userService.editAvatarPicture(email, file);
+        UserResponse response = new UserResponse(user);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/avatar")
+    public ResponseEntity<UserResponse> removeAvatarPicture(Authentication authentication) {
+        String email = authentication.getName();
+        AppUser user = userService.removeAvatarPicture(email);
         UserResponse response = new UserResponse(user);
         return ResponseEntity.ok(response);
     }
