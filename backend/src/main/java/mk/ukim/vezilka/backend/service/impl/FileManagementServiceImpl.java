@@ -81,7 +81,10 @@ public class FileManagementServiceImpl implements FileManagementService {
         Path targetLocation = userStoragePath.resolve(finalFilename);
         file.transferTo(targetLocation);
 
-        return createContentEntity(originalFilename, contentType, targetLocation.toString(), topic, dialectId, description, transcription, isPrivate, user);
+        Content content = createContentEntity(originalFilename, contentType, targetLocation.toString(), topic, dialectId, description, transcription, isPrivate, user);
+        ActivityType activityType = activityService.getActivityByName(contentType.name());
+        activityService.logUpload(user, content, activityType);
+        return content;
     }
 
     @Override
@@ -102,10 +105,6 @@ public class FileManagementServiceImpl implements FileManagementService {
         } catch (Exception ex) {
             throw new RuntimeException("Грешка при вчитување на датотеката: " + path, ex);
         }
-        Content content = createContentEntity(contentType, targetLocation.toString(), topic, dialectId, description, transcription, isPrivate, user);
-        ActivityType activityType = activityService.getActivityByName(contentType.name());
-        activityService.logUpload(user, content, activityType);
-        return content;
     }
 
     private ContentType determineContentType(String mimeType) {
