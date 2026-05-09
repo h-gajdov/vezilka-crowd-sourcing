@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import mk.ukim.vezilka.backend.model.enums.Role;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -35,6 +36,9 @@ public class AppUser {
     private double trustScore;
 
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "uploader")
+    private List<Content> uploads;
 
     public AppUser(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;

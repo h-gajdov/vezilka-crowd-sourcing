@@ -3,6 +3,7 @@ import { FileText, Upload, Video, Mic, Image, X } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import DialectDropdown from "../components/DialectDropdown";
 import UploadEntry from "../components/UploadEntry";
+import { getToken } from "../utils/auth";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -21,7 +22,11 @@ function generateId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-async function fileUpload(file, { dialect, topic, description }, onProgress) {
+async function fileUpload(
+  file,
+  { dialect, topic, description, token },
+  onProgress,
+) {
   const formData = new FormData();
   formData.append("topic", topic);
   formData.append("description", description);
@@ -29,6 +34,9 @@ async function fileUpload(file, { dialect, topic, description }, onProgress) {
 
   const res = await fetch(`${BACKEND_URL}/api/files/upload`, {
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
     body: formData,
   });
 
@@ -37,6 +45,7 @@ async function fileUpload(file, { dialect, topic, description }, onProgress) {
 }
 
 export default function UploadPage() {
+  const token = getToken();
   const [dialect, setDialect] = useState("");
   const [topic, setTopic] = useState("");
   const [description, setDescription] = useState("");
@@ -98,7 +107,7 @@ export default function UploadPage() {
         try {
           await fileUpload(
             entry.file,
-            { dialect, topic, description },
+            { dialect, topic, description, token },
             (progress) => {
               setEntries((prev) =>
                 prev.map((e) => (e.id === entry.id ? { ...e, progress } : e)),
@@ -248,7 +257,7 @@ export default function UploadPage() {
 
               <button
                 onClick={handleSubmit}
-                disabled={stagedFiles.length === 0}
+                disabled={stagedFiles.length === 0 || !topic.trim()}
                 className="inline-flex items-center justify-center w-full gap-2 px-8 mt-8 text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-xl"
               >
                 <Upload className="w-4 h-4" />
