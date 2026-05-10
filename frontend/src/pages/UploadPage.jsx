@@ -9,7 +9,6 @@ import {
   Lock,
   Globe,
   ChevronDown,
-  ChevronRight,
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import DialectDropdown from "../components/DialectDropdown";
@@ -28,6 +27,8 @@ const ACCEPTED_TYPES = [
   ".docx",
   ".txt",
 ];
+
+const BLOCKED_EXTENSIONS = [".ppt"];
 
 const AUDIO_VIDEO_MIME_PREFIXES = ["audio/", "video/"];
 const AUDIO_VIDEO_EXTENSIONS = [
@@ -50,6 +51,10 @@ function isAudioOrVideo(file) {
     return true;
   const ext = "." + file.name.split(".").pop().toLowerCase();
   return AUDIO_VIDEO_EXTENSIONS.includes(ext);
+}
+
+function getExt(file) {
+  return "." + file.name.split(".").pop().toLowerCase();
 }
 
 function generateId() {
@@ -86,11 +91,16 @@ export default function UploadPage() {
   const [topic, setTopic] = useState("");
   const [description, setDescription] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
-  // Each entry: { id, file, transcription, transcriptionOpen }
   const [stagedFiles, setStagedFiles] = useState([]);
   const [entries, setEntries] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [toast, setToast] = useState(null);
   const fileInputRef = useRef(null);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 4000);
+  };
 
   const handleDragOver = useCallback((e) => {
     e.preventDefault();
@@ -100,9 +110,24 @@ export default function UploadPage() {
   const handleDragLeave = useCallback(() => setIsDragging(false), []);
 
   const addStagedFiles = (files) => {
+    const blocked = files.filter((f) => BLOCKED_EXTENSIONS.includes(getExt(f)));
+
+    if (blocked.length) {
+      const names = blocked.map((f) => f.name).join(", ");
+      showToast(
+        `Не е дозволено прикачување на .ppt датотеки: ${names}. Конвертирај во .pptx или .pdf.`,
+      );
+    }
+
+    const allowed = files.filter(
+      (f) => !BLOCKED_EXTENSIONS.includes(getExt(f)),
+    );
+
+    if (!allowed.length) return;
+
     setStagedFiles((prev) => [
       ...prev,
-      ...files.map((f) => ({
+      ...allowed.map((f) => ({
         id: generateId(),
         file: f,
         transcription: "",
@@ -329,7 +354,7 @@ export default function UploadPage() {
                             </button>
                           </div>
 
-                          {/* Collapsible transcription panel — always rendered, animated via max-height */}
+                          {/* Collapsible transcription panel */}
                           {isMedia && (
                             <div
                               style={{
@@ -391,60 +416,77 @@ export default function UploadPage() {
               </div>
 
               {/* Privacy toggle */}
-                <div className="space-y-2">
-                    <label className="text-sm font-medium leading-none">Видливост</label>
-                    <div className="flex p-1.5 bg-muted/50 border border-border rounded-xl">
-                        <button
-                            type="button"
-                            onClick={() => setIsPrivate(false)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm rounded-lg transition-all duration-200 ${
-                                !isPrivate
-                                    ? "bg-background text-primary font-semibold shadow-md ring-1 ring-border"
-                                    : "text-muted-foreground font-medium hover:text-foreground hover:bg-foreground/5"
-                            }`}
-                        >
-                            <Globe className="w-4 h-4"/>
-                            Јавно
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setIsPrivate(true)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm rounded-lg transition-all duration-200 ${
-                                isPrivate
-                                    ? "bg-background text-primary font-semibold shadow-md ring-1 ring-border"
-                                    : "text-muted-foreground font-medium hover:text-foreground hover:bg-foreground/5"
-                            }`}
-                        >
-                            <Lock className="w-4 h-4"/>
-                            Приватно
-                        </button>
-                    </div>
-                    <p className="text-xs text-muted-foreground px-1 mt-1.5">
-                        {isPrivate
-                            ? "Само ти ќе можеш да ја видиш оваа содржина"
-                            : "Содржината ќе биде достапна за сите корисници"}
-                    </p>
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">
+                  Видливост
+                </label>
+                <div className="flex p-1.5 bg-muted/50 border border-border rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setIsPrivate(false)}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm rounded-lg transition-all duration-200 ${
+                      !isPrivate
+                        ? "bg-background text-primary font-semibold shadow-md ring-1 ring-border"
+                        : "text-muted-foreground font-medium hover:text-foreground hover:bg-foreground/5"
+                    }`}
+                  >
+                    <Globe className="w-4 h-4" />
+                    Јавно
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsPrivate(true)}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm rounded-lg transition-all duration-200 ${
+                      isPrivate
+                        ? "bg-background text-primary font-semibold shadow-md ring-1 ring-border"
+                        : "text-muted-foreground font-medium hover:text-foreground hover:bg-foreground/5"
+                    }`}
+                  >
+                    <Lock className="w-4 h-4" />
+                    Приватно
+                  </button>
                 </div>
+                <p className="text-xs text-muted-foreground px-1 mt-1.5">
+                  {isPrivate
+                    ? "Само ти ќе можеш да ја видиш оваа содржина"
+                    : "Содржината ќе биде достапна за сите корисници"}
+                </p>
+              </div>
 
-                <button
-                    onClick={handleSubmit}
-                    disabled={stagedFiles.length === 0 || !topic.trim()}
-                    className="inline-flex items-center justify-center w-full gap-2 px-8 mt-8 text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-xl"
-                >
-                    <Upload className="w-4 h-4"/>
-                    Прикачи содржина
-                    {stagedFiles.length > 0 && (
-                        <span className="ml-1 opacity-75">
+              <button
+                onClick={handleSubmit}
+                disabled={stagedFiles.length === 0 || !topic.trim()}
+                className="inline-flex items-center justify-center w-full gap-2 px-8 mt-8 text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-xl"
+              >
+                <Upload className="w-4 h-4" />
+                Прикачи содржина
+                {stagedFiles.length > 0 && (
+                  <span className="ml-1 opacity-75">
                     ({stagedFiles.length})
                   </span>
-                    )}
-                </button>
+                )}
+              </button>
             </div>
           </div>
 
-            <UploadEntry entries={entries} onRemove={removeEntry}/>
+          <UploadEntry entries={entries} onRemove={removeEntry} />
         </div>
       </main>
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed z-50 flex items-start w-full max-w-sm gap-3 px-4 py-3 mx-4 -translate-x-1/2 border shadow-lg bottom-6 left-1/2 rounded-xl border-destructive/30 bg-destructive/10 text-destructive">
+          <X className="w-4 h-4 mt-0.5 shrink-0" />
+          <p className="flex-1 text-sm leading-snug">{toast}</p>
+          <button
+            onClick={() => setToast(null)}
+            className="p-0.5 rounded hover:bg-destructive/20 transition-colors shrink-0"
+            aria-label="Затвори"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
