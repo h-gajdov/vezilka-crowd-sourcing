@@ -4,7 +4,9 @@ import mk.ukim.vezilka.backend.model.AppUser;
 import mk.ukim.vezilka.backend.model.exceptions.UserAlreadyExistsException;
 import mk.ukim.vezilka.backend.service.AuthService;
 import mk.ukim.vezilka.backend.service.UserService;
+import mk.ukim.vezilka.backend.service.VerificationCodeService;
 import mk.ukim.vezilka.backend.util.JwtUtil;
+import mk.ukim.vezilka.backend.web.request.EmailVerificationRequest;
 import mk.ukim.vezilka.backend.web.request.LoginRequest;
 import mk.ukim.vezilka.backend.web.request.RegisterRequest;
 import mk.ukim.vezilka.backend.web.response.AuthResponse;
@@ -20,17 +22,19 @@ public class AuthController {
     private final AuthService authService;
     private final JwtUtil jwtUtil;
     private final UserService userService;
+    private final VerificationCodeService verificationCodeService;
 
-    public AuthController(AuthService authService, JwtUtil jwtUtil, UserService userService) {
+    public AuthController(AuthService authService, JwtUtil jwtUtil, UserService userService, VerificationCodeService verificationCodeService) {
         this.authService = authService;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
+        this.verificationCodeService = verificationCodeService;
     }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         try {
-            AppUser user = authService.register(request.getFirstName(), request.getLastName(), request.getEmail(), request.getPassword());
+            AppUser user = authService.register(request.getFirstName(), request.getLastName(), request.getEmail(), request.getPassword(), request.getCode());
             String jwtToken = jwtUtil.generateToken(user.getEmail());
             AuthResponse response = new AuthResponse(
                     jwtToken,
@@ -64,6 +68,16 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/register/send-code")
+    public ResponseEntity<String> sendVerificationCode(@RequestBody EmailVerificationRequest request) {
+        try {
+            verificationCodeService.generateAndSendCode(request.getEmail());
+            return ResponseEntity.ok("Кодот е успешно испратен.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Грешка при испраќање на кодот.");
         }
     }
 
