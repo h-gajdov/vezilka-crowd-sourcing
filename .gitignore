@@ -24,7 +24,8 @@ dist-ssr
 *.sw?
 
 __pycache__
-vezilka-processing/image-to-text/data
+vezilka-processing/data
+vezilka-processing/test.ipynb
 .venv
 .env
 backend/media

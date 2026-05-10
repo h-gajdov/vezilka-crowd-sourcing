@@ -3,7 +3,7 @@ import argparse
 from pathlib import Path
 import pytesseract
 from PIL import Image, ImageEnhance, ImageFilter
-from image_to_text import image_to_text
+from image_to_text import transform
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -63,7 +63,7 @@ def main() -> None:
             f"Missing Tesseract language pack(s): {', '.join(missing)}\n"
         )
  
-    text = image_to_text(image_path, preprocess_image=not args.no_preprocess)
+    text = transform(image_path, preprocess_image=not args.no_preprocess)
  
     output_path.write_text(text, encoding="utf-8")
     print(f"Text saved to: {output_path}")
