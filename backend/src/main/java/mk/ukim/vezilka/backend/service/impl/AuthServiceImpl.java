@@ -7,6 +7,7 @@ import mk.ukim.vezilka.backend.model.exceptions.UserNotFoundException;
 import mk.ukim.vezilka.backend.repository.AppUserRepository;
 import mk.ukim.vezilka.backend.service.AuthService;
 import mk.ukim.vezilka.backend.service.UserService;
+import mk.ukim.vezilka.backend.service.VerificationCodeService;
 import mk.ukim.vezilka.backend.util.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,15 +20,18 @@ public class AuthServiceImpl implements AuthService {
     private final AppUserRepository appUserRepository;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final VerificationCodeService verificationCodeService;
 
-    public AuthServiceImpl(AppUserRepository appUserRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, UserService userService) {
+
+    public AuthServiceImpl(AppUserRepository appUserRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, UserService userService, VerificationCodeService verificationCodeService) {
         this.appUserRepository = appUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
+        this.verificationCodeService = verificationCodeService;
     }
 
     @Override
-    public AppUser register(String firstName, String lastName, String email, String password) {
+    public AppUser register(String firstName, String lastName, String email, String password, String code) {
         if(firstName == null || firstName.isEmpty())
             throw new InvalidParameterException("First name can't be empty!");
         if(lastName == null || lastName.isEmpty())
@@ -39,8 +43,11 @@ public class AuthServiceImpl implements AuthService {
 
         if(appUserRepository.findByEmail(email).isPresent())
             throw new UserAlreadyExistsException(email);
-
-        AppUser user = new AppUser(firstName, lastName, email, passwordEncoder.encode(password));
+        boolean isValidCode = verificationCodeService.verifyCode(email, code);
+        if (!isValidCode) {
+            throw new InvalidParameterException("Invalid verification code");
+        }
+        AppUser user = new AppUser(firstName, lastName, email, passwordEncoder.encode(password), true);
         return appUserRepository.save(user);
     }
 

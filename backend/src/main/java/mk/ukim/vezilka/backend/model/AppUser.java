@@ -39,6 +39,10 @@ public class AppUser {
 
     private LocalDateTime createdAt;
 
+//    For testing if there are already users in the db uncomment the line below
+//    @Column(columnDefinition = "bool default true")
+    private boolean isVerified;
+
     @JsonIgnore
     @OneToMany(mappedBy = "uploader")
     private List<Content> uploads;
@@ -53,5 +57,18 @@ public class AppUser {
         this.level = 1;
         this.trustScore = 0;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public AppUser(String firstName, String lastName, String email, String password, boolean isVerified) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = Role.USER;
+        this.points = 0;
+        this.level = 1;
+        this.trustScore = 0;
+        this.createdAt = LocalDateTime.now();
+        this.isVerified = isVerified;
     }
 }
