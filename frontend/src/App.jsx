@@ -3,16 +3,67 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import UploadPage from "./pages/UploadPage";
 import LoginPage from "./pages/LoginPage";
+import { Toaster } from "sonner";
 import RegisterPage from "./pages/RegisterPage";
+import HomePage from "./pages/HomePage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
+import RewardsPage from "./pages/RewardsPage.jsx";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import AuthProvider from "./components/AuthProvider.jsx";
+import EditProfilePage from "./pages/EditProfilePage.jsx";
+import PublicFilesPage from "./pages/PublicFilesPage.jsx";
 
 function App() {
   return (
     <BrowserRouter>
+      <Toaster />
+      <AuthProvider />
       <Routes>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/upload" element={<UploadPage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/public-files" element={<PublicFilesPage />}/>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/upload"
+          element={
+            <ProtectedRoute>
+              <UploadPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/edit"
+          element={
+            <ProtectedRoute>
+              <EditProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rewards"
+          element={
+            <ProtectedRoute>
+              <RewardsPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
