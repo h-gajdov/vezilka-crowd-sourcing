@@ -1,5 +1,8 @@
 from image_to_text.image_to_text import transform
+
 from PIL import Image
+from dataclasses import dataclass
+from typing import Optional
 
 CHUNK_SIZE = 1000 # characters per chunk
 OVERLAP = 0 # keeps context between chunks
@@ -21,3 +24,17 @@ def chunk_text(text, chunk_size=CHUNK_SIZE, overlap=OVERLAP):
         start += chunk_size - overlap
 
     return chunks
+
+@dataclass
+class DatasetRow:
+    id: str
+    text: str
+    source: str
+    chunk: int
+    topic: str
+    description: str
+    file_type: str
+    
+    # Optional metadata
+    dialect: Optional[int] = None
+    page: Optional[int] = None

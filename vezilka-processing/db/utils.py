@@ -13,11 +13,6 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 def get_db_connection():
-    """
-    Creates and returns a PostgreSQL connection.
-    Uses environment variables for safety.
-    """
-
     conn = psycopg2.connect(
         host=os.getenv("DB_HOST", "localhost"),
         port=os.getenv("DB_PORT", "5432"),

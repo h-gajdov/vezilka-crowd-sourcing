@@ -1,17 +1,20 @@
 import os
 import fitz
 import uuid
+import requests
+import tempfile
 import pandas as pd
 import textract
+import logging
 
+from image_to_text.image_to_text import load_image_and_transform
 from pptx import Presentation
 from docx import Document
 from transform.transform_utils import *
 from datasets import Dataset
 
-def extract_pdf(file_path):
+def transform_pdf(file_path, url, row):
     doc = fitz.open(file_path)
-    rows = []
 
     for page_num, page in enumerate(doc):
         text = page.get_text("text").strip()
@@ -22,17 +25,18 @@ def extract_pdf(file_path):
         chunks = chunk_text(text)
 
         for i, chunk in enumerate(chunks):
-            rows.append({
-                "id": str(uuid.uuid4()),
-                "text": chunk,
-                "source": file_path,
-                "page": page_num,
-                "chunk": i
-            })
+            yield DatasetRow(
+                id=str(uuid.uuid4()),
+                text=chunk,
+                source=url,
+                page=page_num,
+                chunk=i,
+                topic=row.topic,
+                description=row.description,
+                file_type=row.type
+            )
 
-    return rows
-
-def extract_docx_text(docx_path):
+def transform_docx_text(docx_path):
     doc = Document(docx_path)
 
     paragraphs = []
@@ -45,40 +49,43 @@ def extract_docx_text(docx_path):
 
     return "\n".join(paragraphs)
 
-def extract_doc_text(doc_path):
+def transform_doc_text(doc_path):
     text = textract.process(doc_path).decode("utf-8")
 
     return text
 
-def extract_document(file_path):
-    rows = []
+def transform_document(file_path, url, row):
+    extension = os.path.splitext(url)[1].lower()
 
-    extension = os.path.splitext(file_path)[1].lower()
+    try:
+        if extension == ".docx":
+            text = transform_docx_text(file_path)
 
-    if extension == ".docx":
-        text = extract_docx_text(file_path)
+        elif extension == ".doc":
+            text = transform_doc_text(file_path)
 
-    elif extension == ".doc":
-        text = extract_doc_text(file_path)
+        else:
+            logging.warning(f"Skipping unsupported file type: {extension} | {url}")
+            return
 
-    else:
-        raise ValueError(f"Unsupported file type: {extension}")
+        chunks = chunk_text(text)
 
-    chunks = chunk_text(text)
+        for i, chunk in enumerate(chunks):
+            yield DatasetRow(
+                id=str(uuid.uuid4()),
+                text=chunk,
+                source=url,
+                chunk=i,
+                topic=row.topic,
+                description=row.description,
+                file_type=row.type
+            )
 
-    for i, chunk in enumerate(chunks):
-        rows.append({
-            "id": str(uuid.uuid4()),
-            "text": chunk,
-            "source": file_path,
-            "chunk": i
-        })
+    except Exception as e:
+        logging.error(f"Failed processing {url}: {e}")
+        return
 
-    return rows
-
-def extract_txt(file_path):
-    rows = []
-
+def transform_txt(file_path, url, row):
     with open(file_path, "r", encoding="utf-8") as f:
         text = f.read()
 
@@ -87,18 +94,17 @@ def extract_txt(file_path):
     chunks = chunk_text(text)
 
     for i, chunk in enumerate(chunks):
-        rows.append({
-            "id": str(uuid.uuid4()),
-            "text": chunk,
-            "source": file_path,
-            "chunk": i
-        })
+        yield DatasetRow(
+            id=str(uuid.uuid4()),
+            text=chunk,
+            source=url,
+            chunk=i,
+            topic=row.topic,
+            description=row.description,
+            file_type=row.type
+        )
 
-    return rows
-
-def extract_pptx(file_path):
-    rows = []
-
+def transform_pptx(file_path, url, row):
     presentation = Presentation(file_path)
 
     for slide_num, slide in enumerate(presentation.slides):
@@ -119,25 +125,115 @@ def extract_pptx(file_path):
         chunks = chunk_text(full_text)
 
         for i, chunk in enumerate(chunks):
-            rows.append({
-                "id": str(uuid.uuid4()),
-                "text": chunk,
-                "source": file_path,
-                "slide": slide_num,
-                "chunk": i
-            })
+            yield DatasetRow(
+                id=str(uuid.uuid4()),
+                text=chunk,
+                source=url,
+                chunk=i,
+                topic=row.topic,
+                description=row.description,
+                file_type=row.type
+            )
 
-    return rows
+def transform_image(file_path, url, row):
+    text = load_image_and_transform(file_path)
 
-# file_path = "./data/presentation.pptx"
-# data = extract_pptx(file_path)
+    chunks = chunk_text(text)
 
-# df = pd.DataFrame(data)
-# df.to_csv("dataset.csv")
-# df.to_csv("dataset.json")
+    for i, chunk in enumerate(chunks):
+        yield DatasetRow(
+            id=str(uuid.uuid4()),
+            text=chunk,
+            source=url,
+            chunk=i,
+            topic=row.topic,
+            description=row.description,
+            file_type=row.type
+        )
 
-# dataset = Dataset.from_list(data)
-# dataset.save_to_disk('./data')
+def transform_video_audio(file_path, url, row):
+    text = row.text
 
-# print(dataset)
-# print(df)
+    chunks = chunk_text(text)
+
+    for i, chunk in enumerate(chunks):
+        yield DatasetRow(
+            id=str(uuid.uuid4()),
+            text=chunk,
+            source=url,
+            chunk=i,
+            topic=row.topic,
+            description=row.description,
+            file_type=row.type
+        )
+
+def download_file(url):
+    r = requests.get(url)
+    r.raise_for_status()
+
+    suffix = os.path.splitext(url)[1]
+
+    tmp = tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=suffix
+    )
+
+    tmp.write(r.content)
+    tmp.close()
+
+    return tmp.name
+
+def process_file(file_row):
+    file_url = (
+        f"{os.getenv('VITE_BACKEND_URL').rstrip('/')}/"
+        f"{file_row.file_url.lstrip('/')}"
+    )
+
+    ext = os.path.splitext(file_url)[1].lower()
+
+    handler = SUPPORTED_EXTENSIONS.get(ext)
+
+    if handler is None:
+        logging.warning(
+            f"Unsupported file type: {ext} | {file_url}"
+        )
+        return
+
+    try:
+        file_path = download_file(file_url)
+
+        yield from handler(file_path, file_url, file_row)
+
+    except Exception as e:
+        logging.exception(
+            f"Failed processing file: {file_url} | {e}"
+        )
+
+SUPPORTED_EXTENSIONS = {
+    ".pdf": transform_pdf,
+
+    ".doc": transform_document,
+    ".docx": transform_document,
+
+    ".txt": transform_txt,
+
+    ".pptx": transform_pptx,
+
+    ".png": transform_image,
+    ".jpg": transform_image,
+    ".jpeg": transform_image,
+
+    ".mp3": transform_video_audio,
+    ".wav": transform_video_audio,
+    ".ogg": transform_video_audio,
+    ".flac": transform_video_audio,
+    ".aac": transform_video_audio,
+    ".m4a": transform_video_audio,
+
+    ".mp4": transform_video_audio,
+    ".mov": transform_video_audio,
+    ".avi": transform_video_audio,
+    ".mkv": transform_video_audio,
+    ".webm": transform_video_audio,
+    ".wmv": transform_video_audio,
+}

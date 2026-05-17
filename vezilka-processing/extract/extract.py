@@ -1,6 +1,6 @@
 from db.utils import *
 
-def get_video_and_audio_with_transcription(conn):
+def iter_video_and_audio_with_transcription(conn, chunk_size=100):
     query = """
         select content.created_at,
             description,
@@ -12,8 +12,22 @@ def get_video_and_audio_with_transcription(conn):
             original_file_name,
             text
         from content
-        join transcription on content.id = transcription.content_id""" # get only the videos and audios that have transcription
+        join transcription
+            on content.id = transcription.content_id
+    """
 
-    df = pd.read_sql(query, conn)
+    for chunk in pd.read_sql(query, conn, chunksize=chunk_size):
+        for row in chunk.itertuples(index=False):
+            yield row
 
-    return df
+
+def iter_text_and_image_data(conn, chunk_size=100):
+    query = """
+        select *
+        from content
+        where type = 'TEXT' or type = 'IMAGE';
+    """
+
+    for chunk in pd.read_sql(query, conn, chunksize=chunk_size):
+        for row in chunk.itertuples(index=False):
+            yield row

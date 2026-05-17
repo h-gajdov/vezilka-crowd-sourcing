@@ -71,6 +71,14 @@ public class FileManagementServiceImpl implements FileManagementService {
         ContentType contentType = determineContentType(file.getContentType());
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String finalFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+        String relativePath = Paths.get("media")
+                .resolve("uploads")
+                .resolve("users")
+                .resolve(String.valueOf(user.getId()))
+                .resolve("data")
+                .resolve(finalFilename)
+                .toString()
+                .replace("\\", "/");
 
         Path userStoragePath = Paths.get(uploadDir)
                 .resolve("users")
@@ -81,7 +89,7 @@ public class FileManagementServiceImpl implements FileManagementService {
         Path targetLocation = userStoragePath.resolve(finalFilename);
         file.transferTo(targetLocation);
 
-        Content content = createContentEntity(originalFilename, contentType, targetLocation.toString(), topic, dialectId, description, transcription, isPrivate, user);
+        Content content = createContentEntity(originalFilename, contentType, relativePath, topic, dialectId, description, transcription, isPrivate, user);
         ActivityType activityType = activityService.getActivityByName(contentType.name());
         activityService.logUpload(user, content, activityType);
         return content;

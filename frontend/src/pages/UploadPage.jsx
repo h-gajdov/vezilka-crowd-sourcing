@@ -18,14 +18,29 @@ import { getToken } from "../utils/auth";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ACCEPTED_TYPES = [
-  "text/*",
-  "image/*",
-  "audio/*",
-  "video/*",
   ".pdf",
   ".doc",
   ".docx",
   ".txt",
+  ".pptx",
+
+  ".png",
+  ".jpg",
+  ".jpeg",
+
+  ".mp3",
+  ".wav",
+  ".ogg",
+  ".flac",
+  ".aac",
+  ".m4a",
+
+  ".mp4",
+  ".mov",
+  ".avi",
+  ".mkv",
+  ".webm",
+  ".wmv",
 ];
 
 const BLOCKED_EXTENSIONS = [".ppt"];
@@ -81,7 +96,31 @@ async function fileUpload(
     body: formData,
   });
 
-  if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+  if (!res.ok) {
+    let message;
+
+    if (res.status === 413) {
+      const maxSize = import.meta.env.VITE_MAX_FILE_SIZE ?? "500MB";
+      message = `Датотеката е преголема за прикачување (максимум ${maxSize})`;
+    } else {
+      message = `Грешка ${res.status}`;
+      try {
+        const body = await res.json();
+        if (body?.message) message = body.message;
+        else if (typeof body === "string" && body.trim()) message = body.trim();
+      } catch {
+        try {
+          const text = await res.text();
+          if (text.trim()) message = text.trim();
+        } catch {
+          /* keep default */
+        }
+      }
+    }
+
+    throw new Error(message);
+  }
+
   onProgress(100);
 }
 
@@ -172,6 +211,7 @@ export default function UploadPage() {
       transcription: isAudioOrVideo(file) ? transcription : "",
       status: "uploading",
       progress: 0,
+      errorMessage: null,
     }));
 
     setEntries((prev) => [...newEntries, ...prev]);
@@ -201,10 +241,12 @@ export default function UploadPage() {
               e.id === entry.id ? { ...e, status: "done", progress: 100 } : e,
             ),
           );
-        } catch {
+        } catch (err) {
           setEntries((prev) =>
             prev.map((e) =>
-              e.id === entry.id ? { ...e, status: "error" } : e,
+              e.id === entry.id
+                ? { ...e, status: "error", errorMessage: err.message }
+                : e,
             ),
           );
         }
