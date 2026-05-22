@@ -180,11 +180,11 @@ export default function AdminPage() {
         <div className="max-w-6xl p-6 mx-auto md:p-8">
           <div className="mb-8">
             <h1 className="text-2xl font-bold md:text-3xl">
-              Админ Панел
+              Преглед и проверка
             </h1>
 
             <p className="mt-1 text-muted-foreground">
-              Управување со документи и проверки
+              Управување со документи
             </p>
           </div>
 

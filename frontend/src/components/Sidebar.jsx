@@ -82,6 +82,7 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
             isActive={activeButtonIndex == 2}
             Icon={SquareCheckBig}
             collapsed={collapsed}
+            href={"/admin"}
           >
             Прегледај
           </SidebarButton>
