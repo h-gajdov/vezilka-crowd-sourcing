@@ -4,6 +4,7 @@ import mk.ukim.vezilka.backend.model.ActivityType;
 import mk.ukim.vezilka.backend.model.AppUser;
 import mk.ukim.vezilka.backend.model.Content;
 import mk.ukim.vezilka.backend.model.Transcription;
+import mk.ukim.vezilka.backend.model.enums.ContentStatus;
 import mk.ukim.vezilka.backend.model.enums.ContentType;
 import mk.ukim.vezilka.backend.model.exceptions.ContentNotFoundException;
 import mk.ukim.vezilka.backend.model.exceptions.InvalidFileException;
@@ -25,6 +26,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -116,5 +119,10 @@ public class FileManagementServiceImpl implements FileManagementService {
         if (mimeType.startsWith("text/") || mimeType.contains("pdf")) return ContentType.TEXT;
 
         return ContentType.TEXT;
+    }
+
+    @Override
+    public List<Content> getPendingFiles() {
+        return contentRepository.getContentByStatus(ContentStatus.PENDING).orElse(new ArrayList<>());
     }
 }

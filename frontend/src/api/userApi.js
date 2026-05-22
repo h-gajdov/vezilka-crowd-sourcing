@@ -1,5 +1,24 @@
 import { getToken, refreshUserObj } from "../utils/auth";
 
+export async function getPendingDocuments() {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const result = await fetch(`${BACKEND_URL}/api/files/pending`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!result.ok) {
+    throw new Error("Failed to fetch pending documents");
+  }
+
+  return result.json();
+}
+
 export async function getUserUploads() {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const token = getToken();

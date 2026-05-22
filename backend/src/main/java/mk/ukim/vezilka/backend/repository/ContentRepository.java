@@ -1,6 +1,7 @@
 package mk.ukim.vezilka.backend.repository;
 
 import mk.ukim.vezilka.backend.model.Content;
+import mk.ukim.vezilka.backend.model.enums.ContentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,5 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     Page<Content> getAllByIsPrivateIsFalse(@Param("search") String search, Pageable pageable);
 
     Optional<Content> getContentById(Long id);
+    Optional<List<Content>> getContentByStatus(ContentStatus status);
 }
