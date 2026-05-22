@@ -13,6 +13,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AuthProvider from "./components/AuthProvider.jsx";
 import EditProfilePage from "./pages/EditProfilePage.jsx";
 import PublicFilesPage from "./pages/PublicFilesPage.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
+import AdminReviewPage from "./pages/AdminReviewPage.jsx";
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/public-files" element={<PublicFilesPage />}/>
+        <Route path="/admin" element={<AdminPage/>}/>
+        <Route path="/admin/review" element={<AdminReviewPage />} />
         <Route
           path="/dashboard"
           element={
