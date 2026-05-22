@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar";
 import Button from "../components/Button";
 import Badge from "../components/Badge";
 import { useLocation, useNavigate } from "react-router-dom";
+import { reviewDocumentAccept, reviewDocumentReject } from "../api/userApi";
 
 import {
     ArrowLeft,
@@ -105,22 +106,36 @@ export default function AdminReviewPage() {
 
     const Icon = typeIcons[document?.type] || FileText;
 
-    const handleApprove = () => {
-        setStatus("approved");
+    const handleApprove = async () => {
+        try {
+            const toSend = {
+                id: document.id,
+                comment: comment
+            };
 
-        console.log({
-            action: "approved",
-            comment,
-        });
+            await reviewDocumentAccept(toSend);
+            setStatus("approved");
+            console.log(toSend);
+
+        } catch (err) {
+            console.error(err);
+        }
     };
 
-    const handleReject = () => {
-        setStatus("rejected");
+    const handleReject = async () => {
+        try {
+            const toSend = {
+                id: document.id,
+                comment: comment
+            };
 
-        console.log({
-            action: "rejected",
-            comment,
-        });
+            await reviewDocumentReject(toSend);
+            setStatus("rejected");
+            console.log(toSend);
+
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (
@@ -281,7 +296,7 @@ export default function AdminReviewPage() {
                                     <div className="flex items-center justify-between">
                                         <span className="text-muted-foreground">Тип</span>
 
-                                        <span>{document.type}</span>
+                                        <span>{document.type == "IMAGE" ? "Слика" : (document.type == "TEXT" ? "Текст" : (document.type == "AUDIO" ? "Аудио" : "Видео"))}</span>
                                     </div>
 
                                     <div className="flex items-center justify-between">
@@ -296,7 +311,7 @@ export default function AdminReviewPage() {
                                                         : "secondary"
                                             }
                                         >
-                                            {status}
+                                            {status == "pending" ? "Непрегледано" : (status == "accepted" ? "Прифатено" : "Одбиено")}
                                         </Badge>
                                     </div>
                                 </div>

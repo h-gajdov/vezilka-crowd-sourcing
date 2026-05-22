@@ -87,7 +87,7 @@ function DocumentGroup({ title, Icon, documents }) {
                                                 : "secondary"
                                     }
                                 >
-                                    {doc.status}
+                                    {doc.status=="PENDING"?"Непрегледано":(doc.status=="ACCEPTED"?"Прифатено":"Одбиено")}
                                 </Badge>
 
                                 <button
@@ -107,7 +107,7 @@ function DocumentGroup({ title, Icon, documents }) {
                                     }
                                     className="px-3 py-1 text-sm border rounded-lg bg-card hover:bg-muted"
                                 >
-                                    Review
+                                    Прегледај
                                 </button>
                             </div>
                         </div>

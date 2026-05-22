@@ -1,6 +1,8 @@
 package mk.ukim.vezilka.backend.service;
 
 import mk.ukim.vezilka.backend.model.Content;
+import mk.ukim.vezilka.backend.model.Review;
+import org.hibernate.event.internal.ReattachVisitor;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,4 +16,6 @@ public interface FileManagementService {
     List<Content> getPendingFiles();
     List<Content> getApprovedFiles();
     List<Content> getRejectedFiles();
+    Review acceptFile(Long id, String comment, String email);
+    Review rejectFile(Long id,String comment, String email);
 }

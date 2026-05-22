@@ -1,15 +1,14 @@
 package mk.ukim.vezilka.backend.service.impl;
 
-import mk.ukim.vezilka.backend.model.ActivityType;
-import mk.ukim.vezilka.backend.model.AppUser;
-import mk.ukim.vezilka.backend.model.Content;
-import mk.ukim.vezilka.backend.model.Transcription;
+import mk.ukim.vezilka.backend.model.*;
 import mk.ukim.vezilka.backend.model.enums.ContentStatus;
 import mk.ukim.vezilka.backend.model.enums.ContentType;
+import mk.ukim.vezilka.backend.model.enums.ReviewDecision;
 import mk.ukim.vezilka.backend.model.exceptions.ContentNotFoundException;
 import mk.ukim.vezilka.backend.model.exceptions.InvalidFileException;
 import mk.ukim.vezilka.backend.repository.ActivityTypeRepository;
 import mk.ukim.vezilka.backend.repository.ContentRepository;
+import mk.ukim.vezilka.backend.repository.ReviewRepository;
 import mk.ukim.vezilka.backend.service.ActivityService;
 import mk.ukim.vezilka.backend.service.FileManagementService;
 import mk.ukim.vezilka.backend.service.TranscriptionService;
@@ -26,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,15 +37,17 @@ public class FileManagementServiceImpl implements FileManagementService {
     private final UserService userService;
     private final TranscriptionService transcriptionService;
     private final ActivityService activityService;
+    private final ReviewRepository reviewRepository;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    public FileManagementServiceImpl(ContentRepository contentRepository, UserService userService, TranscriptionService transcriptionService, ActivityTypeRepository activityTypeRepository, ActivityService activityService) {
+    public FileManagementServiceImpl(ContentRepository contentRepository, UserService userService, TranscriptionService transcriptionService, ActivityTypeRepository activityTypeRepository, ActivityService activityService, ReviewRepository reviewRepository) {
         this.contentRepository = contentRepository;
         this.userService = userService;
         this.transcriptionService = transcriptionService;
         this.activityService = activityService;
+        this.reviewRepository = reviewRepository;
     }
 
     private Content createContentEntity(String originalFilename, ContentType type, String fileUrl, String topic, Long dialectId, String description, String transcription, boolean isPrivate, AppUser user) {
@@ -134,5 +136,42 @@ public class FileManagementServiceImpl implements FileManagementService {
     @Override
     public List<Content> getRejectedFiles(){
         return contentRepository.getContentByStatus(ContentStatus.REJECTED).orElse(new ArrayList<>());
+    }
+
+    @Override
+    public Review acceptFile(Long id,String comment,String email){
+        Content content=contentRepository.getContentById(id).orElse(null);
+        AppUser user=userService.getUserByEmail(email);
+
+        if(content.getStatus()==ContentStatus.PENDING)
+            content.setStatus(ContentStatus.APPROVED);
+
+        Review newReview=new Review();
+        newReview.setComment(comment);
+        newReview.setDecision(ReviewDecision.APPROVE);
+        newReview.setContent(content);
+        newReview.setCreatedAt(LocalDateTime.now());
+        newReview.setReviewer(user);
+
+        contentRepository.save(content);
+        return reviewRepository.save(newReview);
+    }
+
+    @Override
+    public Review rejectFile(Long id,String comment, String email){
+        Content content=contentRepository.getContentById(id).orElse(null);
+        AppUser user=userService.getUserByEmail(email);
+
+        content.setStatus(ContentStatus.REJECTED);
+
+        Review newReview=new Review();
+        newReview.setComment(comment);
+        newReview.setDecision(ReviewDecision.REJECT);
+        newReview.setContent(content);
+        newReview.setCreatedAt(LocalDateTime.now());
+        newReview.setReviewer(user);
+
+        contentRepository.save(content);
+        return reviewRepository.save(newReview);
     }
 }

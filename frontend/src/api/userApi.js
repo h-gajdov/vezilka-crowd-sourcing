@@ -1,5 +1,31 @@
 import { getToken, refreshUserObj } from "../utils/auth";
 
+export const reviewDocumentAccept = async (toSend) => {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const result = await fetch(`${BACKEND_URL}/api/files/accept`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return result;
+};
+
+export const reviewDocumentReject = async (toSend) => {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const result = await fetch(`${BACKEND_URL}/api/files/reject`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return result;
+};
+
 export async function getRejectedDocuments() {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const token = getToken();
