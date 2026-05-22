@@ -22,6 +22,60 @@ const typeIcons = {
     VIDEO: Video,
 };
 
+const renderContent = () => {
+    const location = useLocation();
+    const document = location.state?.document;
+
+    if (!document) return null;
+
+    const type = (document.type || "").toUpperCase();
+
+    console.log(document);
+
+    switch (type) {
+
+        case "IMAGE":
+            return (
+                <img
+                    src={document.fileUrl}
+                    alt={document.title}
+                    className="w-full rounded-xl border"
+                />
+            );
+
+        case "AUDIO":
+            return (
+                <audio controls className="w-full">
+                    <source src={document.fileUrl} type="audio/mpeg" />
+                    Your browser does not support audio.
+                </audio>
+            );
+
+        case "VIDEO":
+            return (
+                <video controls className="w-full rounded-xl">
+                    <source src={document.fileUrl} type="video/mp4" />
+                    Your browser does not support video.
+                </video>
+            );
+
+        case "TEXT":
+            return (
+                <iframe
+                    src={document.fileUrl}
+                    className="w-full h-[600px] rounded-xl border"
+                />
+            );
+
+        default:
+            return (
+                <p className="text-muted-foreground">
+                    Unsupported file type
+                </p>
+            );
+    }
+};
+
 export default function AdminReviewPage() {
 
     const [status, setStatus] = useState("pending");
@@ -156,6 +210,9 @@ export default function AdminReviewPage() {
                                 <h3 className="mb-4 text-lg font-semibold">
                                     Преглед на содржина
                                 </h3>
+
+                                {renderContent()}
+
 
                                 {document.type === "TEXT" && (
                                     <div className="p-4 border rounded-xl border-border bg-muted/20">

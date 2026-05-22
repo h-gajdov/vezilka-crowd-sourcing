@@ -93,7 +93,16 @@ function DocumentGroup({ title, Icon, documents }) {
                                 <button
                                     onClick={() =>
                                         navigate("/admin/review", {
-                                            state: { document: doc },
+                                            state: {
+                                                document: {
+                                                    id: doc.id,
+                                                    title: doc.originalFileName || doc.title,
+                                                    type: doc.type,
+                                                    fileUrl: doc.fileUrl,
+                                                    status: doc.status,
+                                                    description: doc.description
+                                                }
+                                            },
                                         })
                                     }
                                     className="px-3 py-1 text-sm border rounded-lg bg-card hover:bg-muted"
@@ -306,6 +315,18 @@ export default function AdminPage() {
                                             : activeSection === "approved"
                                                 ? approvedDocuments.video
                                                 : rejectedDocuments.video
+                                    }
+                                />
+
+                                <DocumentGroup
+                                    title="Слики"
+                                    Icon={Video}
+                                    documents={
+                                        activeSection === "pending"
+                                            ? pendingDocuments.image
+                                            : activeSection === "approved"
+                                                ? approvedDocuments.image
+                                                : rejectedDocuments.image
                                     }
                                 />
                             </div>
