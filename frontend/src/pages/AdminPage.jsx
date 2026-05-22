@@ -5,6 +5,7 @@ import Badge from "../components/Badge.jsx";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { getPendingDocuments, getRejectedDocuments, getApprovedDocuments } from "../api/userApi";
+import { XCircle } from "lucide-react";
 
 import {
     CheckCircle2,
@@ -15,59 +16,6 @@ import {
     ChevronRight,
     Inbox,
 } from "lucide-react";
-
-const pendingDocuments = {
-    text: [
-        {
-            title: "Македонски дијалекти",
-            date: "12 Мај 2026",
-            status: "pending",
-        },
-        {
-            title: "Истражување за AI",
-            date: "10 Мај 2026",
-            status: "pending",
-        },
-    ],
-    audio: [
-        {
-            title: "Аудио интервју",
-            date: "9 Мај 2026",
-            status: "pending",
-        },
-    ],
-    video: [
-        {
-            title: "Видео презентација",
-            date: "7 Мај 2026",
-            status: "pending",
-        },
-    ],
-};
-
-const checkedDocuments = {
-    text: [
-        {
-            title: "Историја на Македонија",
-            date: "1 Мај 2026",
-            status: "approved",
-        },
-    ],
-    audio: [
-        {
-            title: "Подкаст епизода",
-            date: "28 Апр 2026",
-            status: "approved",
-        },
-    ],
-    video: [
-        {
-            title: "Едукативно видео",
-            date: "25 Апр 2026",
-            status: "rejected",
-        },
-    ],
-};
 
 function SectionCard({ title, Icon, count, onClick, color }) {
     return (
@@ -208,12 +156,18 @@ export default function AdminPage() {
     const totalPending =
         pendingDocuments.text.length +
         pendingDocuments.audio.length +
-        pendingDocuments.video.length;
+        pendingDocuments.video.length +
+        pendingDocuments.image.length;
 
     const totalChecked =
-        checkedDocuments.text.length +
-        checkedDocuments.audio.length +
-        checkedDocuments.video.length;
+        approvedDocuments.text.length +
+        approvedDocuments.audio.length +
+        approvedDocuments.video.length +
+        approvedDocuments.image.length +
+        rejectedDocuments.text.length +
+        rejectedDocuments.audio.length +
+        rejectedDocuments.video.length +
+        rejectedDocuments.image.length;
 
     return (
         <div className="flex min-h-screen bg-background">
@@ -253,7 +207,7 @@ export default function AdminPage() {
                                 />
                             </div>
 
-                            <div className="grid gap-6 md:grid-cols-2">
+                            <div className="grid gap-6 md:grid-cols-2 mb-8">
                                 <SectionCard
                                     title="Документи за проверка"
                                     Icon={Clock3}
@@ -261,13 +215,35 @@ export default function AdminPage() {
                                     color="bg-warning/10 text-warning"
                                     onClick={() => setActiveSection("pending")}
                                 />
+                            </div>
 
+                            <div className="grid gap-6 md:grid-cols-2 mb-8">
                                 <SectionCard
-                                    title="Проверени документи"
+                                    title="Одобрени документи"
                                     Icon={CheckCircle2}
-                                    count={totalChecked}
+                                    count={
+                                        approvedDocuments.text.length +
+                                        approvedDocuments.audio.length +
+                                        approvedDocuments.video.length +
+                                        approvedDocuments.image.length
+                                    }
                                     color="bg-primary/10 text-primary"
-                                    onClick={() => setActiveSection("checked")}
+                                    onClick={() => setActiveSection("approved")}
+                                />
+                            </div>
+
+                            <div className="grid gap-6 md:grid-cols-2 mb-8">
+                                <SectionCard
+                                    title="Одбиени документи"
+                                    Icon={XCircle}
+                                    count={
+                                        rejectedDocuments.text.length +
+                                        rejectedDocuments.audio.length +
+                                        rejectedDocuments.video.length +
+                                        rejectedDocuments.image.length
+                                    }
+                                    color="bg-destructive/10 text-destructive"
+                                    onClick={() => setActiveSection("rejected")}
                                 />
                             </div>
                         </>
@@ -278,9 +254,9 @@ export default function AdminPage() {
                             <div className="flex items-center justify-between mb-6">
                                 <div>
                                     <h2 className="text-2xl font-bold">
-                                        {activeSection === "pending"
-                                            ? "Документи за проверка"
-                                            : "Проверени документи"}
+                                        {activeSection === "pending" && "Документи за проверка"}
+                                        {activeSection === "approved" && "Одобрени документи"}
+                                        {activeSection === "rejected" && "Одбиени документи"}
                                     </h2>
 
                                     <p className="text-sm text-muted-foreground">
@@ -303,7 +279,9 @@ export default function AdminPage() {
                                     documents={
                                         activeSection === "pending"
                                             ? pendingDocuments.text
-                                            : checkedDocuments.text
+                                            : activeSection === "approved"
+                                                ? approvedDocuments.text
+                                                : rejectedDocuments.text
                                     }
                                 />
 
@@ -313,7 +291,9 @@ export default function AdminPage() {
                                     documents={
                                         activeSection === "pending"
                                             ? pendingDocuments.audio
-                                            : checkedDocuments.audio
+                                            : activeSection === "approved"
+                                                ? approvedDocuments.audio
+                                                : rejectedDocuments.audio
                                     }
                                 />
 
@@ -323,7 +303,9 @@ export default function AdminPage() {
                                     documents={
                                         activeSection === "pending"
                                             ? pendingDocuments.video
-                                            : checkedDocuments.video
+                                            : activeSection === "approved"
+                                                ? approvedDocuments.video
+                                                : rejectedDocuments.video
                                     }
                                 />
                             </div>
