@@ -125,4 +125,14 @@ public class FileManagementServiceImpl implements FileManagementService {
     public List<Content> getPendingFiles() {
         return contentRepository.getContentByStatus(ContentStatus.PENDING).orElse(new ArrayList<>());
     }
+
+    @Override
+    public List<Content> getApprovedFiles(){
+        return contentRepository.getContentByStatus(ContentStatus.APPROVED).orElse(new ArrayList<>());
+    }
+
+    @Override
+    public List<Content> getRejectedFiles(){
+        return contentRepository.getContentByStatus(ContentStatus.REJECTED).orElse(new ArrayList<>());
+    }
 }

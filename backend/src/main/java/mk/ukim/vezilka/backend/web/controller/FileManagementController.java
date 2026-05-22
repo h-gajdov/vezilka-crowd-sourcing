@@ -37,4 +37,16 @@ public class FileManagementController {
         List<Content> result = fileManagementService.getPendingFiles();
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/approved")
+    public ResponseEntity<List<Content>> getApprovedFiles() {
+        List<Content> result = fileManagementService.getApprovedFiles();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/rejected")
+    public ResponseEntity<List<Content>> getRejectedFiles() {
+        List<Content> result = fileManagementService.getRejectedFiles();
+        return ResponseEntity.ok(result);
+    }
 }

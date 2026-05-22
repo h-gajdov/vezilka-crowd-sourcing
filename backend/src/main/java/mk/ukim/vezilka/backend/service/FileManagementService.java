@@ -12,4 +12,6 @@ public interface FileManagementService {
 
     Resource loadFileAsResource(String path);
     List<Content> getPendingFiles();
+    List<Content> getApprovedFiles();
+    List<Content> getRejectedFiles();
 }

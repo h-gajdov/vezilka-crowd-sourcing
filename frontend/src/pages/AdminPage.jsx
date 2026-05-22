@@ -4,7 +4,7 @@ import StatCard from "../components/StatCard";
 import Badge from "../components/Badge.jsx";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { getPendingDocuments } from "../api/userApi";
+import { getPendingDocuments, getRejectedDocuments, getApprovedDocuments } from "../api/userApi";
 
 import {
     CheckCircle2,
@@ -164,6 +164,8 @@ function DocumentGroup({ title, Icon, documents }) {
 export default function AdminPage() {
     const [activeSection, setActiveSection] = useState(null);
     const [pending, setPending] = useState([]);
+    const [approved, setApproved] = useState([]);
+    const [rejected, setRejected] = useState([]);
 
     useEffect(() => {
         loadData();
@@ -171,17 +173,36 @@ export default function AdminPage() {
 
     const loadData = async () => {
         try {
-            const data = await getPendingDocuments();
-            setPending(data);
+            const pen = await getPendingDocuments();
+            const appr = await getApprovedDocuments();
+            const rej = await getRejectedDocuments();
+            setPending(pen);
+            setApproved(appr);
+            setRejected(rej);
         } catch (err) {
             console.error(err);
         }
+    };
+
+    const approvedDocuments = {
+        text: approved.filter(d => d.type === "TEXT"),
+        audio: approved.filter(d => d.type === "AUDIO"),
+        video: approved.filter(d => d.type === "VIDEO"),
+        image: approved.filter(d => d.type === "IMAGE"),
+    };
+
+    const rejectedDocuments = {
+        text: rejected.filter(d => d.type === "TEXT"),
+        audio: rejected.filter(d => d.type === "AUDIO"),
+        video: rejected.filter(d => d.type === "VIDEO"),
+        image: rejected.filter(d => d.type === "IMAGE"),
     };
 
     const pendingDocuments = {
         text: pending.filter(d => d.type === "TEXT"),
         audio: pending.filter(d => d.type === "AUDIO"),
         video: pending.filter(d => d.type === "VIDEO"),
+        image: pending.filter(d => d.type === "IMAGE")
     };
 
     const totalPending =

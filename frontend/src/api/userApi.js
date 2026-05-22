@@ -1,5 +1,42 @@
 import { getToken, refreshUserObj } from "../utils/auth";
 
+export async function getRejectedDocuments() {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const result = await fetch(`${BACKEND_URL}/api/files/rejected`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!result.ok) {
+    throw new Error("Failed to fetch rejected documents");
+  }
+
+  return result.json();
+}
+export async function getApprovedDocuments() {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const result = await fetch(`${BACKEND_URL}/api/files/approved`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!result.ok) {
+    throw new Error("Failed to fetch approved documents");
+  }
+
+  return result.json();
+}
+
 export async function getPendingDocuments() {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const token = getToken();
