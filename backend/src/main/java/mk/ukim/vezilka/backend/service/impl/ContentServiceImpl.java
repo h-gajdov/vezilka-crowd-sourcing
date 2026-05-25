@@ -35,4 +35,9 @@ public class ContentServiceImpl implements ContentService {
         }
         return fileManagementService.loadFileAsResource(content.getFileUrl());
     }
+
+    @Override
+    public Content getContentById(Long id) {
+        return contentRepository.getContentById(id).orElse(null);
+    }
 }

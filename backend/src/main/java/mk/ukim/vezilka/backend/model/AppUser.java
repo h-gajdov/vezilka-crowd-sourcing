@@ -71,4 +71,8 @@ public class AppUser {
         this.createdAt = LocalDateTime.now();
         this.isVerified = isVerified;
     }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 }

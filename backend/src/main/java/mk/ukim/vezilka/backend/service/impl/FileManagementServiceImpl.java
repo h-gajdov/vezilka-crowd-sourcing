@@ -147,12 +147,13 @@ public class FileManagementServiceImpl implements FileManagementService {
     }
 
     @Override
-    public Review acceptFile(Long id,String comment,String email){
+    public Review acceptFile(Long id,String comment,String email, Double qualityScore, String transcription){
         Content content=contentRepository.getContentById(id).orElse(null);
         AppUser user=userService.getUserByEmail(email);
 
-        if(content.getStatus()==ContentStatus.PENDING)
-            content.setStatus(ContentStatus.APPROVED);
+        content.setStatus(ContentStatus.APPROVED);
+        content.setQualityScore(qualityScore);
+        transcriptionService.editTranscriptionOfContent(id, transcription);
 
         Review newReview=new Review();
         newReview.setComment(comment);
@@ -166,11 +167,13 @@ public class FileManagementServiceImpl implements FileManagementService {
     }
 
     @Override
-    public Review rejectFile(Long id,String comment, String email){
+    public Review rejectFile(Long id,String comment, String email, Double qualityScore, String transcription){
         Content content=contentRepository.getContentById(id).orElse(null);
         AppUser user=userService.getUserByEmail(email);
 
         content.setStatus(ContentStatus.REJECTED);
+        content.setQualityScore(qualityScore);
+        transcriptionService.editTranscriptionOfContent(id, transcription);
 
         Review newReview=new Review();
         newReview.setComment(comment);

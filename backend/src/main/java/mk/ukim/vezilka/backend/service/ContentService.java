@@ -11,4 +11,5 @@ import java.util.List;
 public interface ContentService {
     Page<Content> getPublicContents(String search, int pageNumber, int pageSize);
     Resource getPublicContentAsFile(Long id);
+    Content getContentById(Long id);
 }

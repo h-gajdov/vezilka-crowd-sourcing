@@ -17,4 +17,18 @@ public class TranscriptionServiceImpl implements TranscriptionService {
     public Transcription saveTranscription(Transcription transcription) {
         return transcriptionRepository.save(transcription);
     }
+
+    @Override
+    public Transcription getTranscriptionFromContentId(Long contentId) {
+        return transcriptionRepository.getByContent_Id(contentId).orElse(null);
+    }
+
+    @Override
+    public Transcription editTranscriptionOfContent(Long contentId, String text) {
+        Transcription transcription = transcriptionRepository.getByContent_Id(contentId).orElseThrow(() -> new IllegalArgumentException("Content with " + contentId + " can't be found!"));
+
+        transcription.setText(text);
+
+        return transcriptionRepository.save(transcription);
+    }
 }

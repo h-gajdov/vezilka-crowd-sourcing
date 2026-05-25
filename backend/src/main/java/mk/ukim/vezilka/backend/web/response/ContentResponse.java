@@ -28,6 +28,8 @@ public class ContentResponse {
     private ContentStatus status;
     private double qualityScore;
     private LocalDateTime createdAt;
+    private String uploaderFullName;
+    private String avatarUrl;
 
     public ContentResponse(Content content) {
         this.id = content.getId();
@@ -40,5 +42,7 @@ public class ContentResponse {
         this.status = content.getStatus();
         this.qualityScore = content.getQualityScore();
         this.createdAt = content.getCreatedAt();
+        this.uploaderFullName = content.getUploader().getFullName();
+        this.avatarUrl = content.getUploader().getAvatarUrl();
     }
 }

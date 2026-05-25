@@ -10,4 +10,6 @@ import lombok.NoArgsConstructor;
 public class ReviewRequest {
     private String comment;
     private Long id;
+    private Double qualityScore;
+    private String transcription;
 }
