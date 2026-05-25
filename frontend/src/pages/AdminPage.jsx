@@ -101,7 +101,7 @@ function DocumentGroup({ title, Icon, documents }) {
                       state: {
                         document: {
                           id: doc.id,
-                          title: doc.topic || doc.originalFileName,
+                          title: doc.originalFileName || doc.topic,
                           type: doc.type,
                           fileUrl: doc.fileUrl,
                           status: doc.status,

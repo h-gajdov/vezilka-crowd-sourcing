@@ -28,6 +28,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/**").authenticated()
                         .anyRequest().permitAll()
+                ).securityMatcher("/media/**")
+                .headers(headers -> headers
+                        .frameOptions(frameOptions -> frameOptions.disable()) // to make embed of pdf work
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

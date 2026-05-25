@@ -1,8 +1,10 @@
 import { jwtDecode } from "jwt-decode";
+import { normalizeUrls } from "./normalizeUrls";
 
 export const saveAuth = (authResponse) => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  const avatarUrl = (authResponse.avatarUrl) ? `${BACKEND_URL}/${authResponse.avatarUrl}` : null;
+  // const avatarUrl = (authResponse.avatarUrl) ? `${BACKEND_URL}/${authResponse.avatarUrl}` : null;
+  const avatarUrl = normalizeUrls(authResponse.avatarUrl);
   localStorage.setItem('token', authResponse.jwtToken);
   localStorage.setItem('user', JSON.stringify({
     firstName: authResponse.firstName,

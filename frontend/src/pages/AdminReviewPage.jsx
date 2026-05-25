@@ -15,6 +15,7 @@ import {
   Calendar,
   User,
 } from "lucide-react";
+import { normalizeUrls } from "../utils/normalizeUrls";
 
 const typeIcons = {
   TEXT: FileText,
@@ -29,14 +30,15 @@ const renderContent = () => {
   if (!document) return null;
 
   const type = (document.type || "").toUpperCase();
+  const fileUrl = normalizeUrls(document.fileUrl || "");
 
-  console.log(document);
+  const fileExtension = fileUrl.split(".").pop().toLowerCase();
 
   switch (type) {
     case "IMAGE":
       return (
         <img
-          src={document.fileUrl}
+          src={fileUrl}
           alt={document.title}
           className="w-full border rounded-xl"
         />
@@ -45,7 +47,7 @@ const renderContent = () => {
     case "AUDIO":
       return (
         <audio controls className="w-full">
-          <source src={document.fileUrl} type="audio/mpeg" />
+          <source src={fileUrl} type="audio/mpeg" />
           Your browser does not support audio.
         </audio>
       );
@@ -53,15 +55,49 @@ const renderContent = () => {
     case "VIDEO":
       return (
         <video controls className="w-full rounded-xl">
-          <source src={document.fileUrl} type="video/mp4" />
+          <source src={fileUrl} type="video/mp4" />
           Your browser does not support video.
         </video>
       );
 
     case "TEXT":
+      if (fileExtension === "pdf") {
+        return (
+          <iframe
+            src={fileUrl}
+            title={document.title}
+            className="w-full h-[600px] rounded-xl border"
+          />
+        );
+      }
+
+      const isLocalhost =
+        fileUrl.includes("localhost") || fileUrl.includes("127.0.0.1");
+      if (isLocalhost) {
+        return (
+          <div className="flex flex-col items-center justify-center p-8 border rounded-xl bg-muted/20 min-h-[300px] text-center">
+            <p className="mb-4 text-sm text-muted-foreground">
+              Онлајн прегледувачот на Office не може да отвори{" "}
+              <strong>localhost</strong> датотеки ({fileExtension.toUpperCase()}
+              ).
+            </p>
+            <a
+              href={fileUrl}
+              download
+              target="_blank"
+              rel="noreferrer"
+              className="px-4 py-2 text-sm font-medium text-white transition-colors rounded-xl bg-primary hover:opacity-90"
+            >
+              Преземи ја презентацијата
+            </a>
+          </div>
+        );
+      }
+
       return (
         <iframe
-          src={document.fileUrl}
+          src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fileUrl)}`}
+          title={document.title}
           className="w-full h-[600px] rounded-xl border"
         />
       );
@@ -229,14 +265,6 @@ export default function AdminReviewPage() {
                     <audio controls className="w-full">
                       <source src="/sample-audio.mp3" type="audio/mpeg" />
                     </audio>
-                  </div>
-                )}
-
-                {document.type === "VIDEO" && (
-                  <div className="p-4 border rounded-xl border-border bg-muted/20">
-                    <video controls className="w-full rounded-xl">
-                      <source src="/sample-video.mp4" type="video/mp4" />
-                    </video>
                   </div>
                 )}
               </div>
