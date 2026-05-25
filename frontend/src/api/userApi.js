@@ -239,3 +239,64 @@ export async function getUserActivities() {
 
   return data;
 }
+
+export async function getTranscription(contentId) {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const res = await fetch(
+    `${BACKEND_URL}/api/files/transcription/${contentId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to get transcription");
+  }
+
+  return await res.text();
+}
+
+export async function getLatestReview(contentId) {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const res = await fetch(
+    `${BACKEND_URL}/api/review/content/${contentId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("");
+  }
+  return await res.json();
+}
+
+export async function getQualityScore(contentId) {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const res = await fetch(
+    `${BACKEND_URL}/api/files/quality-score/${contentId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("");
+  }
+  return Number(await res.text());;
+}

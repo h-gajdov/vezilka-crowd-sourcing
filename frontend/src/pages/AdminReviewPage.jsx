@@ -3,7 +3,13 @@ import Sidebar from "../components/Sidebar";
 import Button from "../components/Button";
 import Badge from "../components/Badge";
 import { useLocation, useNavigate } from "react-router-dom";
-import { reviewDocumentAccept, reviewDocumentReject } from "../api/userApi";
+import {
+  getLatestReview,
+  getQualityScore,
+  getTranscription,
+  reviewDocumentAccept,
+  reviewDocumentReject,
+} from "../api/userApi";
 
 import {
   ArrowLeft,
@@ -14,6 +20,9 @@ import {
   XCircle,
   Calendar,
   User,
+  Star,
+  ScrollText,
+  Loader2,
 } from "lucide-react";
 import { normalizeUrls } from "../utils/normalizeUrls";
 
@@ -108,13 +117,62 @@ const renderContent = () => {
 };
 
 export default function AdminReviewPage() {
-  const [status, setStatus] = useState("pending");
-  const [comment, setComment] = useState("");
-
   const location = useLocation();
   const navigate = useNavigate();
 
   const document = location.state?.document;
+
+  const [status, setStatus] = useState(
+    document?.status?.toLowerCase() || "pending",
+  );
+  const [comment, setComment] = useState("");
+  const [qualityScore, setQualityScore] = useState(3);
+  const [latestReviewer, setLatestReviewer] = useState(null);
+  const [transcription, setTranscription] = useState("");
+  const [transcriptionLoading, setTranscriptionLoading] = useState(false);
+  const [transcriptionError, setTranscriptionError] = useState(false);
+
+  const isMediaType = ["AUDIO", "VIDEO"].includes(
+    (document?.type || "").toUpperCase(),
+  );
+
+  useEffect(() => {
+    const fetchLatestReviewer = async () => {
+      try {
+        const result = await getLatestReview(document.id);
+        setLatestReviewer(result.reviewerFullName);
+      } catch (err) {
+        setLatestReviewer("");
+      }
+    };
+
+    const fetchTranscription = async () => {
+      setTranscriptionLoading(true);
+      setTranscriptionError(false);
+      try {
+        const result = await getTranscription(document.id);
+        setTranscription(result?.text ?? result ?? "");
+      } catch (err) {
+        console.error(err);
+        setTranscriptionError(true);
+      } finally {
+        setTranscriptionLoading(false);
+      }
+    };
+
+    const fetchQualityScore = async () => {
+      try {
+        const result = await getQualityScore(document.id);
+        setQualityScore(result);
+      } catch (err) {
+        setQualityScore(3);
+      }
+    };
+
+    fetchTranscription();
+    fetchLatestReviewer();
+    fetchQualityScore();
+  }, [document?.id]);
 
   if (!document) {
     return (
@@ -138,12 +196,12 @@ export default function AdminReviewPage() {
     try {
       const toSend = {
         id: document.id,
-        comment: comment,
+        comment,
+        qualityScore,
+        transcription,
       };
-
       await reviewDocumentAccept(toSend);
       setStatus("approved");
-      console.log(toSend);
     } catch (err) {
       console.error(err);
     }
@@ -153,12 +211,12 @@ export default function AdminReviewPage() {
     try {
       const toSend = {
         id: document.id,
-        comment: comment,
+        comment,
+        qualityScore,
+        ...(isMediaType && { transcription }),
       };
-
       await reviewDocumentReject(toSend);
       setStatus("rejected");
-      console.log(toSend);
     } catch (err) {
       console.error(err);
     }
@@ -170,8 +228,8 @@ export default function AdminReviewPage() {
 
       <main className="flex-1 pb-20 overflow-auto lg:pb-0 pt-14 lg:pt-0">
         <div className="max-w-5xl p-6 mx-auto md:p-8">
-          <div className="flex items-center gap-4 mb-8">
-            <Button variant="outline" to="/admin">
+          <div className="mb-8">
+            <Button variant="outline" to="/admin" className="mb-3">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Назад
             </Button>
@@ -223,13 +281,11 @@ export default function AdminReviewPage() {
                 <div className="grid gap-4 mt-8 md:grid-cols-2">
                   <div className="flex items-center gap-3 text-sm">
                     <User className="w-4 h-4 text-muted-foreground" />
-
                     <span>{document.uploadedBy}</span>
                   </div>
 
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
-
                     <span>{document.createdAt}</span>
                   </div>
                 </div>
@@ -245,29 +301,48 @@ export default function AdminReviewPage() {
                 </div>
               </div>
 
+              {/* Media player card */}
               <div className="p-6 border bg-card border-border rounded-2xl card-elevated">
                 <h3 className="mb-4 text-lg font-semibold">
                   Преглед на содржина
                 </h3>
 
                 {renderContent()}
-
-                {document.type === "TEXT" && (
-                  <div className="p-4 border rounded-xl border-border bg-muted/20">
-                    <p className="text-sm leading-relaxed">
-                      Овде ќе се прикаже текстуалната содржина на документот.
-                    </p>
-                  </div>
-                )}
-
-                {document.type === "AUDIO" && (
-                  <div className="p-4 border rounded-xl border-border bg-muted/20">
-                    <audio controls className="w-full">
-                      <source src="/sample-audio.mp3" type="audio/mpeg" />
-                    </audio>
-                  </div>
-                )}
               </div>
+
+              {/* Transcription card — only for AUDIO / VIDEO */}
+              {isMediaType && (
+                <div className="p-6 border bg-card border-border rounded-2xl card-elevated">
+                  <div className="flex items-center gap-2 mb-4">
+                    <ScrollText className="w-5 h-5 text-primary" />
+                    <h3 className="text-lg font-semibold">Транскрипција</h3>
+                  </div>
+
+                  {transcriptionLoading ? (
+                    <div className="flex items-center justify-center gap-2 min-h-[160px] text-sm text-muted-foreground">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Се вчитува транскрипцијата...</span>
+                    </div>
+                  ) : transcriptionError ? (
+                    <div className="flex flex-col items-center justify-center gap-3 min-h-[160px] text-center">
+                      <p className="text-sm text-muted-foreground">
+                        Транскрипцијата не можеше да се вчита. Можете да ја
+                        внесете рачно.
+                      </p>
+                    </div>
+                  ) : null}
+
+                  {/* Always show the editable textarea once loading is done */}
+                  {!transcriptionLoading && (
+                    <textarea
+                      value={transcription}
+                      onChange={(e) => setTranscription(e.target.value)}
+                      placeholder="Транскрипцијата ќе се прикаже овде. Можете да ја уредувате..."
+                      className="w-full min-h-[200px] rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition-colors focus:border-primary leading-relaxed resize-y"
+                    />
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="space-y-6">
@@ -282,6 +357,40 @@ export default function AdminReviewPage() {
                   placeholder="Остави коментар..."
                   className="w-full min-h-[160px] rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition-colors focus:border-primary"
                 />
+
+                <div className="mt-4">
+                  <label className="block mb-2 text-sm font-medium">
+                    Оценка за квалитет
+                  </label>
+
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((score) => (
+                      <button
+                        key={score}
+                        type="button"
+                        onClick={() => setQualityScore(score)}
+                        className="p-1 transition-transform hover:scale-110 focus:outline-none"
+                        aria-label={`Оценка ${score}`}
+                      >
+                        <Star
+                          className="transition-colors w-7 h-7"
+                          fill={score <= qualityScore ? "currentColor" : "none"}
+                          strokeWidth={1.5}
+                          style={{
+                            color:
+                              score <= qualityScore
+                                ? "var(--color-primary, #f59e0b)"
+                                : "var(--color-muted-foreground, #9ca3af)",
+                          }}
+                        />
+                      </button>
+                    ))}
+
+                    <span className="ml-2 text-sm font-semibold tabular-nums text-muted-foreground">
+                      {qualityScore} / 5
+                    </span>
+                  </div>
+                </div>
 
                 <div className="grid gap-3 mt-6">
                   <button
@@ -323,21 +432,45 @@ export default function AdminReviewPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Статус</span>
 
-                    <Badge
-                      variant={
-                        status === "approved"
-                          ? "default"
-                          : status === "rejected"
-                            ? "destructive"
-                            : "secondary"
-                      }
-                    >
+                    <span>
                       {status == "pending"
                         ? "Непрегледано"
-                        : status == "accepted"
+                        : status == "approved"
                           ? "Прифатено"
                           : "Одбиено"}
-                    </Badge>
+                    </span>
+                  </div>
+                  {latestReviewer && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">
+                        Прегледано од:
+                      </span>
+
+                      <span>{latestReviewer}</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">
+                      Оценка за квалитет
+                    </span>
+
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((score) => (
+                        <Star
+                          key={score}
+                          className="w-3.5 h-3.5"
+                          fill={score <= qualityScore ? "currentColor" : "none"}
+                          strokeWidth={1.5}
+                          style={{
+                            color:
+                              score <= qualityScore
+                                ? "var(--color-primary, #f59e0b)"
+                                : "var(--color-muted-foreground, #9ca3af)",
+                          }}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
