@@ -3,10 +3,8 @@ export function formatRelativeTime(dateString) {
   const now = new Date();
   const diffInSeconds = Math.floor((now - date) / 1000);
 
-  // Ако датумот е во иднина или е погрешен
   if (diffInSeconds < 0) return "штотуку";
 
-  // Дефинирање на временски интервали во секунди
   const intervals = {
     година: 31536000,
     месец: 2592000,
@@ -22,7 +20,6 @@ export function formatRelativeTime(dateString) {
     if (value >= 1) {
       let suffix = "";
       
-      // Логика за множина и македонски граматички наставки
       if (unit === "секунда") suffix = value === 1 ? "секунда" : "секунди";
       else if (unit === "минута") suffix = value === 1 ? "минута" : "минути";
       else if (unit === "час") suffix = value === 1 ? "час" : "часа";

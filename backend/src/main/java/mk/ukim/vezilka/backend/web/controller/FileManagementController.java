@@ -52,14 +52,14 @@ public class FileManagementController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/accept")
+    @PostMapping("/reject")
     public ResponseEntity<Review> rejectFile(@RequestBody ReviewRequest request,Authentication authentication) {
         String email=authentication.getName();
         Review result = fileManagementService.rejectFile(request.getId(),request.getComment(),email);
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/reject")
+    @GetMapping("/accept")
     public ResponseEntity<Review> acceptFile(@RequestBody ReviewRequest request,Authentication authentication) {
         String email=authentication.getName();
         Review result = fileManagementService.acceptFile(request.getId(),request.getComment(),email);

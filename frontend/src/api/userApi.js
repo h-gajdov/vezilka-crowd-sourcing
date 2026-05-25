@@ -7,8 +7,10 @@ export const reviewDocumentAccept = async (toSend) => {
   const result = await fetch(`${BACKEND_URL}/api/files/accept`, {
     method: "POST",
     headers: {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify(toSend),
   });
   return result;
 };
@@ -20,8 +22,10 @@ export const reviewDocumentReject = async (toSend) => {
   const result = await fetch(`${BACKEND_URL}/api/files/reject`, {
     method: "POST",
     headers: {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify(toSend),
   });
   return result;
 };
