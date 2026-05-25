@@ -60,6 +60,14 @@ public class UserServiceImpl implements UserService {
         AppUser user = getUserByEmail(email);
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String finalFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+        String relativePath = Paths.get("media")
+                .resolve("uploads")
+                .resolve("users")
+                .resolve(String.valueOf(user.getId()))
+                .resolve("profile")
+                .resolve(finalFilename)
+                .toString()
+                .replace("\\", "/");
 
         Path userStoragePath = Paths.get(uploadDir)
                 .resolve("users")
@@ -70,7 +78,7 @@ public class UserServiceImpl implements UserService {
         Path targetLocation = userStoragePath.resolve(finalFilename);
         file.transferTo(targetLocation);
 
-        user.setAvatarUrl(targetLocation.toString());
+        user.setAvatarUrl(relativePath);
 
         return appUserRepository.save(user);
     }
