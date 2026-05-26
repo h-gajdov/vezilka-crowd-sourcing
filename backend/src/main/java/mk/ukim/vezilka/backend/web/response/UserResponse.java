@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import mk.ukim.vezilka.backend.model.AppUser;
+import mk.ukim.vezilka.backend.model.enums.Role;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +20,8 @@ public class UserResponse {
     private String location;
     private String biography;
     private String avatarUrl;
+    private Role role;
+    private boolean isBlocked;
 
     public UserResponse(AppUser user) {
         this.firstName = user.getFirstName();
@@ -29,5 +32,7 @@ public class UserResponse {
         this.location = user.getLocation();
         this.biography = user.getBiography();
         this.avatarUrl = user.getAvatarUrl();
+        this.role = user.getRole();
+        this.isBlocked = user.isBlocked();
     }
 }

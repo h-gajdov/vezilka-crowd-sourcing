@@ -92,3 +92,20 @@ export function isTokenExpired() {
     return true;
   }
 }
+
+
+export async function userIsAdmin() {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const res = await fetch(`${BACKEND_URL}/api/user/details`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+
+  return data.role == 'ADMIN';
+}

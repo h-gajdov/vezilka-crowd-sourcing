@@ -1,4 +1,5 @@
 import { getToken, refreshUserObj } from "../utils/auth";
+import { normalizeUrls } from "../utils/normalizeUrls";
 
 export const reviewDocumentAccept = async (toSend) => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -327,8 +328,77 @@ export async function getHomePageStats() {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch dialects");
+    throw new Error("Failed to fetch home page stats");
   }
 
   return await res.json();
+}
+
+export async function getAllUsersPaginated(pageNum, search = "") {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const res = await fetch(
+    `${BACKEND_URL}/api/user/all?pageNumber=${pageNum}&search=${encodeURIComponent(search)}`,
+    {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    }
+  );
+ 
+  if (!res.ok) throw new Error("Failed to fetch users");
+ 
+  const data = await res.json();
+  let i = 0;
+  return {
+    users: data.content.map((user) => ({
+      ...user,
+      avatarUrl: normalizeUrls(user.avatarUrl),
+      id: i++
+    })),
+    totalPages: data.totalPages,
+    totalElements: data.totalElements,
+  };
+}
+
+export async function blockUser(email) {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const res = await fetch(`${BACKEND_URL}/api/user/block`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: email,
+  });
+ 
+  if (!res.ok) throw new Error("Failed to block user");
+  return res.json();
+}
+
+export async function unblockUser(email) {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const res = await fetch(`${BACKEND_URL}/api/user/unblock`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: email
+  });
+ 
+  if (!res.ok) throw new Error("Failed to unblock user");
+  return res.json();
+}
+
+export async function updateUserRole(email, role) {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const res = await fetch(`${BACKEND_URL}/api/user/role`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: JSON.stringify({ email, role }),
+  });
+ 
+  if (!res.ok) throw new Error("Failed to update user role");
+  return res.json();
 }

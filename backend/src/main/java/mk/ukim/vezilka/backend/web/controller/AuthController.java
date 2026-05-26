@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 
 @RestController
@@ -58,6 +59,9 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         try {
             AppUser user = authService.login(request.getEmail(), request.getPassword());
+            if(user.isBlocked())
+                return ResponseEntity.status(423).build();
+
             String jwtToken = jwtUtil.generateToken(user.getEmail());
             AuthResponse response = new AuthResponse(
                     jwtToken,

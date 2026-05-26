@@ -2,11 +2,14 @@ package mk.ukim.vezilka.backend.service.impl;
 
 import mk.ukim.vezilka.backend.model.AppUser;
 import mk.ukim.vezilka.backend.model.Content;
+import mk.ukim.vezilka.backend.model.enums.Role;
 import mk.ukim.vezilka.backend.model.exceptions.InvalidFileException;
 import mk.ukim.vezilka.backend.model.exceptions.UserNotFoundException;
 import mk.ukim.vezilka.backend.repository.AppUserRepository;
 import mk.ukim.vezilka.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -99,5 +102,31 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long getNumberOfUsers() {
         return appUserRepository.count();
+    }
+
+    @Override
+    public Page<AppUser> getUsersPaginated(String search, int pageNum, int pageSize) {
+        return appUserRepository.searchUsers(search, PageRequest.of(pageNum, pageSize));
+    }
+
+    @Override
+    public AppUser blockUser(String email) {
+        AppUser user = getUserByEmail(email);
+        user.setBlocked(true);
+        return appUserRepository.save(user);
+    }
+
+    @Override
+    public AppUser unblockUser(String email) {
+        AppUser user = getUserByEmail(email);
+        user.setBlocked(false);
+        return appUserRepository.save(user);
+    }
+
+    @Override
+    public AppUser changeRole(String email, Role role) {
+        AppUser user = getUserByEmail(email);
+        user.setRole(role);
+        return appUserRepository.save(user);
     }
 }

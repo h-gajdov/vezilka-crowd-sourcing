@@ -43,6 +43,9 @@ public class AppUser {
 //    @Column(columnDefinition = "bool default true")
     private boolean isVerified;
 
+    @Column(columnDefinition = "bool default false")
+    private boolean isBlocked;
+
     @JsonIgnore
     @OneToMany(mappedBy = "uploader")
     private List<Content> uploads;

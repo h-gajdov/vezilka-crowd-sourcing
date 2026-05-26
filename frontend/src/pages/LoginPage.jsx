@@ -46,6 +46,10 @@ export default function LoginPage() {
         const msg = await res.text();
         if (res.status === 400 || res.status === 403) {
           setError("Погрешна е-пошта или лозинка. Обиди се повторно.");
+        } else if (res.status == 423) {
+          setError(
+            "Вашиот профил е блокиран. Ве молиме контактирајте за повеќе информации.",
+          );
         } else {
           setError(msg || "Најавата не успеа. Обиди се повторно.");
         }
