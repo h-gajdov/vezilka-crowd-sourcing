@@ -15,6 +15,7 @@ import EditProfilePage from "./pages/EditProfilePage.jsx";
 import PublicFilesPage from "./pages/PublicFilesPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
 import AdminReviewPage from "./pages/AdminReviewPage.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 function App() {
   return (
@@ -82,6 +83,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
