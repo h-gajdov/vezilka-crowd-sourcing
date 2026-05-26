@@ -318,3 +318,17 @@ export async function getDialects() {
 
   return await res.json();
 }
+
+export async function getHomePageStats() {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+  const res = await fetch(`${BACKEND_URL}/api/home/stats`, {
+    method: "GET",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch dialects");
+  }
+
+  return await res.json();
+}

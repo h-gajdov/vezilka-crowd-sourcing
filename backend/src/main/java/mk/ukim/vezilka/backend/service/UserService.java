@@ -17,4 +17,6 @@ public interface UserService {
     List<Content> getUploadsByUser(String email);
 
     AppUser removeAvatarPicture(String email);
+
+    Long getNumberOfUsers();
 }

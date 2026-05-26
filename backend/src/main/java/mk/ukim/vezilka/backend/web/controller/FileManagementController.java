@@ -1,6 +1,5 @@
 package mk.ukim.vezilka.backend.web.controller;
 
-import jakarta.validation.constraints.NotBlank;
 import mk.ukim.vezilka.backend.model.Content;
 import mk.ukim.vezilka.backend.model.Review;
 import mk.ukim.vezilka.backend.model.Transcription;
@@ -12,7 +11,6 @@ import mk.ukim.vezilka.backend.service.FileValidationService;
 import mk.ukim.vezilka.backend.web.request.UploadContentRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

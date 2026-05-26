@@ -10,7 +10,7 @@ import {
 import Sidebar from "../components/Sidebar";
 import StatCard from "../components/StatCard";
 import RecentActivities from "../components/RecentActivities";
-import { getUser } from "../utils/auth";
+import { getUser, userCanReview } from "../utils/auth";
 import { useEffect, useState } from "react";
 import { getUserDashboardStats } from "../api/userApi";
 
@@ -18,6 +18,20 @@ export default function DashboardPage() {
   const user = getUser();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [canReview, setCanReview] = useState(null);
+  useEffect(() => {
+    const fetchReviewStatus = async () => {
+      try {
+        const result = await userCanReview();
+        setCanReview(result);
+      } catch {
+        setCanReview(false);
+      }
+    };
+
+    fetchReviewStatus();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,8 +106,8 @@ export default function DashboardPage() {
                 </div>
               </div>
             </a>
-            {user.userCanReview && (
-              <a className="flex-1 block" href="#">
+            {canReview && (
+              <a className="flex-1 block" href="/admin">
                 {/* This button will only be available for admins */}
                 <div className="flex items-center gap-4 p-6 border bg-card border-border rounded-xl card-elevated">
                   <div className="p-3 rounded-xl bg-accent/10 text-accent">

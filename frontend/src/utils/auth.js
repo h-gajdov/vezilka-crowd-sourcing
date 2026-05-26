@@ -36,6 +36,26 @@ export const refreshUserObj = async () => {
   return data;
 }
 
+export const userCanReview = async () => {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const res = await fetch(`${BACKEND_URL}/api/auth`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to refresh user");
+  }
+
+  const data = await res.json();
+
+  return data.userCanReview;
+}
+
 export const getToken = () => localStorage.getItem('token');
 export const setToken = (token) => localStorage.setItem("token", token);
 

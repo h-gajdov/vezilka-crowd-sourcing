@@ -185,4 +185,9 @@ public class FileManagementServiceImpl implements FileManagementService {
         contentRepository.save(content);
         return reviewRepository.save(newReview);
     }
+
+    @Override
+    public Long getNumberOfUploads() {
+        return contentRepository.count();
+    }
 }

@@ -11,7 +11,9 @@ import { motion } from "framer-motion";
 import Button from "../components/Button.jsx";
 import { NavLink, useLocation } from "react-router-dom";
 import { FileText, Mic, Video, Shield, Users, Trophy } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getHomePageStats } from "../api/userApi.js";
+import { formatCompactNumber } from "../utils/formatCompactNumber.js";
 
 export default function HomePage() {
   const location = useLocation();
@@ -39,12 +41,57 @@ export default function HomePage() {
   );
 }
 
+function StatSkeleton() {
+  return (
+    <div className="text-center">
+      <div className="flex justify-center mb-2">
+        <svg
+          className="w-8 h-8 animate-spin text-primary/40"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
+        </svg>
+      </div>
+      <div className="w-16 h-3 mx-auto mt-1 rounded-full bg-muted-foreground/20 animate-pulse" />
+    </div>
+  );
+}
+
 function HeroSection() {
-  const stats = [
-    { value: "10K+", label: "Придонесувачи" },
-    { value: "500K+", label: "Податочни точки" },
-    { value: "98%", label: "Точност" },
-  ];
+  const [stats, setStats] = useState([]);
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const result = await getHomePageStats();
+        const formattedResult = result.map((item) => ({
+          ...item,
+          value: formatCompactNumber(item.value),
+        }));
+        setStats(formattedResult);
+        setLoadingStats(false);
+      } catch {
+        setLoadingStats(true); // show the spinners if it can't load
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <section
@@ -107,21 +154,23 @@ function HeroSection() {
         </motion.div>
 
         <motion.div
-          className="grid max-w-md grid-cols-3 gap-8 mx-auto mt-16"
+          className="grid max-w-md grid-cols-2 gap-8 mx-auto mt-16"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          {stats.map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="text-2xl font-bold md:text-3xl text-foreground">
-                {stat.value}
-              </div>
-              <div className="mt-1 text-sm text-muted-foreground">
-                {stat.label}
-              </div>
-            </div>
-          ))}
+          {loadingStats
+            ? Array.from({ length: 2 }).map((_, i) => <StatSkeleton key={i} />)
+            : stats.map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <div className="text-2xl font-bold md:text-3xl text-foreground">
+                    {stat.value}
+                  </div>
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
         </motion.div>
       </div>
     </section>
@@ -137,14 +186,6 @@ const HowItWorksSection = () => {
       title: "Прикачи",
       description:
         "Сподели текст, аудио или видео на македонски. Секој придонес е важен.",
-    },
-    {
-      icon: CheckCircle,
-      key: "review",
-      color: "bg-accent/10 text-accent",
-      title: "Прегледај",
-      description:
-        "Помогни да се проверат туѓите придонеси за квалитетни податоци.",
     },
     {
       icon: Star,
@@ -167,13 +208,13 @@ const HowItWorksSection = () => {
     <section id="how-it-works" className="py-20 md:py-32">
       <div className="container px-4 mx-auto">
         <div className="mb-16 text-center">
-          <h2 className="text-3xl font-bold md:text-4xl">Како функционира</h2>
+          <h2 className="text-3xl font-bold md:text-4xl">Kako функционира</h2>
           <p className="max-w-xl mx-auto mt-4 text-lg text-muted-foreground">
             Четири едноставни чекори за придонес кон македонската јазична ВИ
           </p>
         </div>
 
-        <div className="grid max-w-5xl grid-cols-1 gap-8 mx-auto md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid max-w-5xl grid-cols-1 gap-8 mx-auto md:grid-cols-2 lg:grid-cols-3">
           {steps.map((step, i) => (
             <motion.div
               key={step.key}
@@ -296,7 +337,7 @@ function Footer() {
               href="#how-it-works"
               className="transition-colors hover:text-foreground"
             >
-              Како функционира
+              Kako функционира
             </a>
             <a
               href="#features"

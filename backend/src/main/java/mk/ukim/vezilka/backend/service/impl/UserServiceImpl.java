@@ -95,4 +95,9 @@ public class UserServiceImpl implements UserService {
         user.setAvatarUrl(null);
         return appUserRepository.save(user);
     }
+
+    @Override
+    public Long getNumberOfUsers() {
+        return appUserRepository.count();
+    }
 }

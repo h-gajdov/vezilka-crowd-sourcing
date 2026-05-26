@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SidebarButton from "./SidebarButton";
 import {
   LayoutDashboard,
@@ -10,18 +10,38 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
-import { clearAuth, getUser } from "../utils/auth";
+import { clearAuth, userCanReview } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ activeButtonIndex = 0 }) {
-  const user = getUser();
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+  const [canReview, setCanReview] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReviewStatus = async () => {
+      try {
+        const result = await userCanReview();
+        setCanReview(result);
+      } catch {
+        setCanReview(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviewStatus();
+  }, []);
 
   const handleLogout = () => {
     clearAuth();
     navigate("/");
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <aside
@@ -80,7 +100,7 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
           >
             Прикачи
           </SidebarButton>
-          {user.userCanReview && (
+          {canReview && (
             <SidebarButton
               isActive={activeButtonIndex == 2}
               Icon={SquareCheckBig}

@@ -18,4 +18,6 @@ public interface FileManagementService {
     List<Content> getRejectedFiles();
     Review acceptFile(Long id, String comment, String email, Double qualityScore, String transcription);
     Review rejectFile(Long id,String comment, String email, Double qualityScore, String transcription);
+
+    Long getNumberOfUploads();
 }
