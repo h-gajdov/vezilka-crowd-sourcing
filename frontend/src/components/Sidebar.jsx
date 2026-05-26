@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { clearAuth, userCanReview } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
+import Spinner from "./Spinner";
 
 export default function Sidebar({ activeButtonIndex = 0 }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -40,7 +41,7 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Spinner></Spinner>;
   }
 
   return (

@@ -6,6 +6,7 @@ import {
   userCanReview,
 } from "../utils/auth";
 import { useEffect, useState } from "react";
+import Spinner from "./Spinner";
 
 function ProtectedRoute({ children, requireReview = false }) {
   const token = getToken();
@@ -34,7 +35,7 @@ function ProtectedRoute({ children, requireReview = false }) {
   }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Spinner></Spinner>;
   }
 
   if (requireReview && !canReview) {
