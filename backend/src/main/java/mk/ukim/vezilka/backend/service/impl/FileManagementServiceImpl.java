@@ -9,10 +9,7 @@ import mk.ukim.vezilka.backend.model.exceptions.InvalidFileException;
 import mk.ukim.vezilka.backend.repository.ActivityTypeRepository;
 import mk.ukim.vezilka.backend.repository.ContentRepository;
 import mk.ukim.vezilka.backend.repository.ReviewRepository;
-import mk.ukim.vezilka.backend.service.ActivityService;
-import mk.ukim.vezilka.backend.service.FileManagementService;
-import mk.ukim.vezilka.backend.service.TranscriptionService;
-import mk.ukim.vezilka.backend.service.UserService;
+import mk.ukim.vezilka.backend.service.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -38,20 +35,23 @@ public class FileManagementServiceImpl implements FileManagementService {
     private final TranscriptionService transcriptionService;
     private final ActivityService activityService;
     private final ReviewRepository reviewRepository;
+    private final DialectService dialectService;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    public FileManagementServiceImpl(ContentRepository contentRepository, UserService userService, TranscriptionService transcriptionService, ActivityTypeRepository activityTypeRepository, ActivityService activityService, ReviewRepository reviewRepository) {
+    public FileManagementServiceImpl(ContentRepository contentRepository, UserService userService, TranscriptionService transcriptionService, ActivityTypeRepository activityTypeRepository, ActivityService activityService, ReviewRepository reviewRepository, DialectService dialectService) {
         this.contentRepository = contentRepository;
         this.userService = userService;
         this.transcriptionService = transcriptionService;
         this.activityService = activityService;
         this.reviewRepository = reviewRepository;
+        this.dialectService = dialectService;
     }
 
     private Content createContentEntity(String originalFilename, ContentType type, String fileUrl, String topic, Long dialectId, String description, String transcription, boolean isPrivate, AppUser user) {
-        Content content = new Content(originalFilename, type, fileUrl, topic, null, description, isPrivate, user);
+        Dialect dialect = dialectService.getDialectById(dialectId);
+        Content content = new Content(originalFilename, type, fileUrl, topic, dialect, description, isPrivate, user);
         content = contentRepository.save(content);
 
         if (transcription != null && !transcription.isEmpty()) {

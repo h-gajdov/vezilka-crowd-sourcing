@@ -300,3 +300,21 @@ export async function getQualityScore(contentId) {
   }
   return Number(await res.text());;
 }
+
+export async function getDialects() {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = getToken();
+
+  const res = await fetch(`${BACKEND_URL}/api/dialect`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch dialects");
+  }
+
+  return await res.json();
+}

@@ -47,7 +47,7 @@ public class FileManagementController {
             Content result = fileManagementService.uploadFile(
                     request.getTopic(), request.getDescription(),
                     request.getTranscription(), request.isPrivateContent(),
-                    0L, file, email);
+                    request.getDialectId(), file, email);
             return ResponseEntity.ok(result);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity

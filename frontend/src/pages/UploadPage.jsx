@@ -86,7 +86,7 @@ async function fileUpload(
   formData.append("description", description);
   formData.append("file", file);
   formData.append("privateContent", String(isPrivate));
-  // formData.append("dialect", dialect);
+  formData.append("dialectId", dialect);
   if (transcription) formData.append("transcription", transcription);
 
   const res = await fetch(`${BACKEND_URL}/api/files/upload`, {

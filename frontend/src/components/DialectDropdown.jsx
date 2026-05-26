@@ -1,36 +1,50 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
+import { getDialects } from "../api/userApi";
 
-export default function DialectDropdown() {
+export default function DialectDropdown({ value, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedDialect, setSelectedDialect] = useState("");
+  const [dialectGroups, setDialectGroups] = useState([]);
   const dropdownRef = useRef(null);
 
-  const dialectGroups = [
-    {
-      label: "Западни дијалекти",
-      options: [
-        "Прилепско-битолски",
-        "Охридско-преспански",
-        "Тетовски",
-        "Гостиварски",
-        "Дебарски",
-      ],
-    },
-    {
-      label: "Источни дијалекти",
-      options: [
-        "Штипско-струмички",
-        "Малешевско-пирински",
-        "Кочанско-винички",
-        "Гевгелиски",
-      ],
-    },
-    {
-      label: "Северни дијалекти",
-      options: ["Кумановски", "Скопско-црногорски", "Кривопаланечки"],
-    },
-  ];
+  useEffect(() => {
+    const fetchDialects = async () => {
+      try {
+        const data = await getDialects();
+
+        const grouped = data.reduce((acc, dialect) => {
+          const existingGroup = acc.find(
+            (group) => group.label === dialect.region,
+          );
+
+          if (existingGroup) {
+            existingGroup.options.push(dialect);
+          } else {
+            acc.push({
+              label: dialect.region,
+              options: [dialect],
+            });
+          }
+
+          return acc;
+        }, []);
+
+        setDialectGroups(grouped);
+        if (!value) {
+          const defaultDialect = data.find((d) =>
+            d.name.startsWith("Литературен"),
+          );
+          if (defaultDialect && onChange) {
+            onChange(defaultDialect.id);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchDialects();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -38,14 +52,19 @@ export default function DialectDropdown() {
         setIsOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSelect = (dialect) => {
-    setSelectedDialect(dialect);
+    onChange(dialect.id);
     setIsOpen(false);
   };
+
+  const currentSelectedObj = dialectGroups
+    ?.flatMap((g) => g.options)
+    .find((d) => d.id === value);
 
   return (
     <div className="w-full" ref={dropdownRef}>
@@ -62,16 +81,21 @@ export default function DialectDropdown() {
             bg-background border rounded-lg transition-all duration-150
             focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
             hover:border-foreground/30 mt-1
-            ${isOpen ? "border-foreground/30 ring-2 ring-ring ring-offset-2" : "border-input"}
+            ${
+              isOpen
+                ? "border-foreground/30 ring-2 ring-ring ring-offset-2"
+                : "border-input"
+            }
           `}
         >
           <span
             className={
-              selectedDialect ? "text-foreground" : "text-muted-foreground"
+              currentSelectedObj ? "text-foreground" : "text-muted-foreground"
             }
           >
-            {selectedDialect || "Избери дијалект..."}
+            {currentSelectedObj?.name || "Избери дијалект..."}
           </span>
+
           <ChevronDown
             className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${
               isOpen ? "rotate-180" : ""
@@ -91,10 +115,11 @@ export default function DialectDropdown() {
                   </p>
 
                   {group.options.map((dialect) => {
-                    const isSelected = selectedDialect === dialect;
+                    const isSelected = value === dialect.id;
+
                     return (
                       <button
-                        key={dialect}
+                        key={dialect.id}
                         type="button"
                         onClick={() => handleSelect(dialect)}
                         className={`
@@ -103,14 +128,15 @@ export default function DialectDropdown() {
                           ${
                             isSelected
                               ? "bg-primary/8 text-primary font-medium"
-                              : "text-popover-foreground hover:bg-accent hover:text-white"
+                              : "text-popover-foreground hover:bg-accent/10 hover:text-accent-foreground"
                           }
                         `}
                       >
                         {isSelected && (
                           <span className="absolute right-2.5 w-1.5 h-1.5 rounded-full bg-primary" />
                         )}
-                        {dialect}
+
+                        {dialect.name}
                       </button>
                     );
                   })}

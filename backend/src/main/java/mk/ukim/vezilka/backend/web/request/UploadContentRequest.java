@@ -14,4 +14,5 @@ public class UploadContentRequest {
     private String description;
     private boolean privateContent;
     private String transcription;
+    private Long dialectId;
 }
