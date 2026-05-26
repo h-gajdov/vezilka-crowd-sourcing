@@ -25,9 +25,23 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/public-files" element={<PublicFilesPage />}/>
-        <Route path="/admin" element={<AdminPage/>}/>
-        <Route path="/admin/review" element={<AdminReviewPage />} />
+        <Route path="/public-files" element={<PublicFilesPage />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requireReview={true}>
+              <AdminPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/review"
+          element={
+            <ProtectedRoute requireReview={true}>
+              <AdminReviewPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={

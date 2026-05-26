@@ -10,10 +10,11 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
-import { clearAuth } from "../utils/auth";
+import { clearAuth, getUser } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ activeButtonIndex = 0 }) {
+  const user = getUser();
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
 
@@ -36,7 +37,8 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
         className="flex flex-col h-full"
       >
         <div className="flex items-center justify-between mb-10">
-          <span
+          <a
+            href="/"
             style={{
               maxWidth: collapsed ? "0px" : "200px",
               opacity: collapsed ? 0 : 1,
@@ -47,7 +49,7 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
             className="text-xl font-bold text-gradient"
           >
             Везилка
-          </span>
+          </a>
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
@@ -78,14 +80,16 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
           >
             Прикачи
           </SidebarButton>
-          <SidebarButton
-            isActive={activeButtonIndex == 2}
-            Icon={SquareCheckBig}
-            collapsed={collapsed}
-            href={"/admin"}
-          >
-            Прегледај
-          </SidebarButton>
+          {user.userCanReview && (
+            <SidebarButton
+              isActive={activeButtonIndex == 2}
+              Icon={SquareCheckBig}
+              collapsed={collapsed}
+              href={"/admin"}
+            >
+              Прегледај
+            </SidebarButton>
+          )}
           <SidebarButton
             isActive={activeButtonIndex == 3}
             Icon={Gift}

@@ -1,6 +1,7 @@
 package mk.ukim.vezilka.backend.web.controller;
 
 import mk.ukim.vezilka.backend.model.AppUser;
+import mk.ukim.vezilka.backend.model.enums.Role;
 import mk.ukim.vezilka.backend.model.exceptions.UserAlreadyExistsException;
 import mk.ukim.vezilka.backend.service.AuthService;
 import mk.ukim.vezilka.backend.service.UserService;
@@ -42,6 +43,7 @@ public class AuthController {
                     user.getLastName(),
                     user.getEmail(),
                     user.getAvatarUrl(),
+                    !user.getRole().equals(Role.USER),
                     LocalDateTime.now()
             );
             return ResponseEntity.ok(response);
@@ -63,6 +65,7 @@ public class AuthController {
                     user.getLastName(),
                     user.getEmail(),
                     user.getAvatarUrl(),
+                    !user.getRole().equals(Role.USER),
                     user.getCreatedAt()
             );
             return ResponseEntity.ok(response);

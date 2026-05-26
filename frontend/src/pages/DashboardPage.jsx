@@ -92,20 +92,23 @@ export default function DashboardPage() {
                 </div>
               </div>
             </a>
-            <a className="flex-1 block" href="#">
-              {/* This button will only be available for admins */}
-              <div className="flex items-center gap-4 p-6 border bg-card border-border rounded-xl card-elevated">
-                <div className="p-3 rounded-xl bg-accent/10 text-accent">
-                  <SquareCheckBig />
+            {user.userCanReview && (
+              <a className="flex-1 block" href="#">
+                {/* This button will only be available for admins */}
+                <div className="flex items-center gap-4 p-6 border bg-card border-border rounded-xl card-elevated">
+                  <div className="p-3 rounded-xl bg-accent/10 text-accent">
+                    <SquareCheckBig />
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold">Прегледај содржина</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Помогни во проверката на поставените податоци
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold">Прегледај содржина</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Помогни во проверката на поставените податоци
-                  </p>
-                </div>
-              </div>
-            </a>
+              </a>
+            )}
           </div>
           <RecentActivities></RecentActivities>
         </div>
