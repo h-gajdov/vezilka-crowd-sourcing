@@ -25,15 +25,23 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
+    let res;
     try {
-      const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
+      res = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(form),
       });
+    } catch (networkErr) {
+      setError(
+        "Во моментот не може да пристапиме до серверот. Проверете ја вашата интернет врска и обидете се повторно.",
+      );
+      return;
+    }
 
+    try {
       if (!res.ok) {
         const msg = await res.text();
         if (res.status === 400 || res.status === 403) {
@@ -41,7 +49,7 @@ export default function LoginPage() {
         } else {
           setError(msg || "Најавата не успеа. Обиди се повторно.");
         }
-        throw new Error(msg || "Registration failed");
+        return;
       }
 
       const data = await res.json();
@@ -49,6 +57,7 @@ export default function LoginPage() {
       navigate("/dashboard");
     } catch (err) {
       console.error(err.message);
+      setError("Настана неочекувана грешка. Обиди се повторно.");
     }
   };
 
