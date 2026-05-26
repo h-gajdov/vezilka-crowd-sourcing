@@ -21,7 +21,6 @@ export default function HomePage() {
   useEffect(() => {
     if (location.hash) {
       const element = document.getElementById(location.hash.replace("#", ""));
-
       if (element) {
         setTimeout(() => {
           element.scrollIntoView({ behavior: "smooth" });
@@ -86,7 +85,7 @@ function HeroSection() {
         setStats(formattedResult);
         setLoadingStats(false);
       } catch {
-        setLoadingStats(true); // show the spinners if it can't load
+        setLoadingStats(true);
       }
     };
 
@@ -96,10 +95,10 @@ function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative pt-32 pb-20 overflow-hidden md:pt-44 md:pb-32"
+      className="relative pb-16 overflow-hidden pt-28 sm:pt-32 sm:pb-20 md:pt-44 md:pb-32"
     >
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full hero-gradient opacity-[0.07] blur-3xl" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[300px] h-[300px] sm:w-[600px] sm:h-[600px] rounded-full hero-gradient opacity-[0.07] blur-3xl" />
       </div>
 
       <div className="container px-4 mx-auto text-center">
@@ -108,14 +107,14 @@ function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-            <Sparkles className="w-4 h-4" />
-            Поддршка за вештачка интелигенција на македонски јазик
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium mb-6">
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span>Поддршка за вештачка интелигенција на македонски јазик</span>
           </div>
         </motion.div>
 
         <motion.h1
-          className="max-w-4xl mx-auto text-4xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl"
+          className="max-w-4xl mx-auto text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-6xl lg:text-7xl"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -125,7 +124,7 @@ function HeroSection() {
         </motion.h1>
 
         <motion.p
-          className="max-w-2xl mx-auto mt-6 text-lg leading-relaxed md:text-xl text-muted-foreground"
+          className="max-w-2xl mx-auto mt-4 text-base leading-relaxed sm:mt-6 sm:text-lg md:text-xl text-muted-foreground"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -136,25 +135,32 @@ function HeroSection() {
         </motion.p>
 
         <motion.div
-          className="flex flex-col justify-center gap-4 mt-10 sm:flex-row"
+          className="flex flex-col justify-center gap-3 mt-8 sm:flex-row sm:gap-4 sm:mt-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <NavLink to="/register">
-            <Button size="lg" className="gap-2 px-8 text-base">
+          <NavLink to="/register" className="w-full sm:w-auto">
+            <Button
+              size="lg"
+              className="w-full gap-2 px-6 text-sm sm:w-auto sm:px-8 sm:text-base"
+            >
               Започни да придонесуваш <ArrowRight className="w-4 h-4" />
             </Button>
           </NavLink>
-          <NavLink to="#how-it-works">
-            <Button variant="outline" size="lg" className="px-8 text-base">
+          <NavLink to="#how-it-works" className="w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full px-6 text-sm sm:w-auto sm:px-8 sm:text-base"
+            >
               Дознај повеќе
             </Button>
           </NavLink>
         </motion.div>
 
         <motion.div
-          className="grid max-w-md grid-cols-2 gap-8 mx-auto mt-16"
+          className="grid max-w-xs grid-cols-2 gap-6 mx-auto mt-12 sm:max-w-md sm:gap-8 sm:mt-16"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
@@ -163,10 +169,10 @@ function HeroSection() {
             ? Array.from({ length: 2 }).map((_, i) => <StatSkeleton key={i} />)
             : stats.map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-2xl font-bold md:text-3xl text-foreground">
+                  <div className="text-xl font-bold sm:text-2xl md:text-3xl text-foreground">
                     {stat.value}
                   </div>
-                  <div className="mt-1 text-sm text-muted-foreground">
+                  <div className="mt-1 text-xs sm:text-sm text-muted-foreground">
                     {stat.label}
                   </div>
                 </div>
@@ -205,32 +211,38 @@ const HowItWorksSection = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 md:py-32">
+    <section id="how-it-works" className="py-16 md:py-32">
       <div className="container px-4 mx-auto">
-        <div className="mb-16 text-center">
-          <h2 className="text-3xl font-bold md:text-4xl">Kako функционира</h2>
-          <p className="max-w-xl mx-auto mt-4 text-lg text-muted-foreground">
-            Четири едноставни чекори за придонес кон македонската јазична ВИ
+        <div className="mb-10 text-center sm:mb-16">
+          <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
+            Како функционира
+          </h2>
+          <p className="max-w-xl mx-auto mt-3 text-base sm:mt-4 sm:text-lg text-muted-foreground">
+            Три едноставни чекори за придонес кон македонската јазична ВИ
           </p>
         </div>
 
-        <div className="grid max-w-5xl grid-cols-1 gap-8 mx-auto md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid max-w-5xl grid-cols-1 gap-4 mx-auto sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {steps.map((step, i) => (
             <motion.div
               key={step.key}
-              className="relative p-6 text-center border rounded-2xl bg-card card-elevated border-border"
+              className="relative p-5 text-center border sm:p-6 rounded-2xl bg-card card-elevated border-border"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
             >
-              <div className="mb-4 text-xs font-bold text-muted-foreground">
+              <div className="mb-3 text-xs font-bold sm:mb-4 text-muted-foreground">
                 Чекор {i + 1}
               </div>
-              <div className={`inline-flex p-3 rounded-xl ${step.color} mb-4`}>
-                <step.icon className="w-6 h-6" />
+              <div
+                className={`inline-flex p-3 rounded-xl ${step.color} mb-3 sm:mb-4`}
+              >
+                <step.icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">{step.title}</h3>
+              <h3 className="mb-2 text-base font-semibold sm:text-lg">
+                {step.title}
+              </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {step.description}
               </p>
@@ -287,32 +299,34 @@ function FeaturesSection() {
   ];
 
   return (
-    <section id="features" className="py-20 md:py-32 bg-secondary/50">
+    <section id="features" className="py-16 md:py-32 bg-secondary/50">
       <div className="container px-4 mx-auto">
-        <div className="mb-16 text-center">
-          <h2 className="text-3xl font-bold md:text-4xl">
+        <div className="mb-10 text-center sm:mb-16">
+          <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
             Што можеш да правиш
           </h2>
-          <p className="max-w-xl mx-auto mt-4 text-lg text-muted-foreground">
+          <p className="max-w-xl mx-auto mt-3 text-base sm:mt-4 sm:text-lg text-muted-foreground">
             Повеќе начини да придонесеш и да оставиш печат
           </p>
         </div>
 
-        <div className="grid max-w-5xl grid-cols-1 gap-6 mx-auto md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid max-w-5xl grid-cols-1 gap-4 mx-auto sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
           {features.map((f, i) => (
             <motion.div
               key={f.key}
-              className="p-6 border rounded-2xl bg-card border-border card-elevated"
+              className="p-5 border sm:p-6 rounded-2xl bg-card border-border card-elevated"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
             >
-              <div className="inline-flex p-2.5 rounded-lg bg-primary/10 text-primary mb-4">
+              <div className="inline-flex p-2.5 rounded-lg bg-primary/10 text-primary mb-3 sm:mb-4">
                 <f.icon className="w-5 h-5" />
               </div>
-              <h3 className="mb-2 text-base font-semibold">{f.title}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
+              <h3 className="mb-1.5 sm:mb-2 text-sm sm:text-base font-semibold">
+                {f.title}
+              </h3>
+              <p className="text-xs leading-relaxed sm:text-sm text-muted-foreground">
                 {f.description}
               </p>
             </motion.div>
@@ -325,11 +339,11 @@ function FeaturesSection() {
 
 function Footer() {
   return (
-    <footer className="py-12 border-t border-border">
+    <footer className="py-10 border-t sm:py-12 border-border">
       <div className="container px-4 mx-auto">
-        <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+        <div className="flex flex-col items-center gap-5 sm:gap-6 md:flex-row md:justify-between">
           <div className="text-lg font-bold text-gradient">Везилка</div>
-          <div className="flex gap-8 text-sm text-muted-foreground">
+          <div className="flex flex-wrap justify-center gap-5 text-sm sm:gap-8 text-muted-foreground">
             <a href="#hero" className="transition-colors hover:text-foreground">
               Почетна
             </a>
@@ -346,7 +360,7 @@ function Footer() {
               Можности
             </a>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-center sm:text-sm text-muted-foreground md:text-right">
             © 2026 Везилка. Сите права се задржани.
           </p>
         </div>

@@ -1,4 +1,11 @@
-import { ArrowRight, Lock, Mail, AlertCircle, Key } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowLeft,
+  Lock,
+  Mail,
+  AlertCircle,
+  Key,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { saveAuth } from "../utils/auth";
@@ -272,6 +279,13 @@ export default function RegisterPage() {
               Создај сметка <ArrowRight className="w-4 h-4"></ArrowRight>
             </button>
           </form>
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center justify-center w-full gap-2 px-8 mt-3 text-sm font-medium transition-colors border cursor-pointer whitespace-nowrap ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border-border bg-card hover:bg-muted h-11 rounded-xl"
+            type="button"
+          >
+            <ArrowLeft className="w-4 h-4" /> Назад
+          </button>
           <p className="mt-6 text-sm text-center text-muted-foreground">
             Веќе имаш сметка?{" "}
             <a

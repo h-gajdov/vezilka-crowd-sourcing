@@ -14,7 +14,6 @@ import {
   updateUserRole,
 } from "../api/userApi";
 import { XCircle } from "lucide-react";
-
 import {
   CheckCircle2,
   Clock3,
@@ -42,19 +41,19 @@ function SectionCard({ title, Icon, count, onClick, color }) {
       onClick={onClick}
       className="w-full text-left transition-all duration-200 border bg-card border-border rounded-2xl card-elevated hover:scale-[1.01] hover:bg-muted/30"
     >
-      <div className="flex items-center justify-between p-6">
-        <div className="flex items-center gap-4">
-          <div className={`p-3 rounded-xl ${color}`}>
-            <Icon className="w-6 h-6" />
+      <div className="flex items-center justify-between p-4 sm:p-6">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className={`p-2.5 sm:p-3 rounded-xl ${color}`}>
+            <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-
           <div>
-            <h3 className="text-lg font-semibold">{title}</h3>
-            <p className="text-sm text-muted-foreground">{count} документи</p>
+            <h3 className="text-base font-semibold sm:text-lg">{title}</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              {count} документи
+            </p>
           </div>
         </div>
-
-        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
       </div>
     </button>
   );
@@ -64,16 +63,15 @@ function DocumentGroup({ title, Icon, documents }) {
   const navigate = useNavigate();
 
   return (
-    <div className="p-6 border bg-card border-border rounded-2xl card-elevated">
-      <div className="flex items-center gap-3 mb-5">
-        <div className="p-2 rounded-lg bg-primary/10 text-primary">
+    <div className="p-4 border sm:p-6 bg-card border-border rounded-2xl card-elevated">
+      <div className="flex items-center gap-3 mb-4 sm:mb-5">
+        <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
           <Icon className="w-5 h-5" />
         </div>
-
-        <h2 className="text-lg font-semibold">{title}</h2>
+        <h2 className="text-base font-semibold sm:text-lg">{title}</h2>
       </div>
 
-      <div className="space-y-3">
+      <div className="pr-1 space-y-3 overflow-y-auto max-h-72">
         {documents.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-center">
             <Inbox className="w-5 h-5 mb-2 text-muted-foreground" />
@@ -83,16 +81,18 @@ function DocumentGroup({ title, Icon, documents }) {
           documents.map((doc, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-4 transition-colors rounded-xl bg-muted/40 hover:bg-muted/60"
+              className="flex flex-col gap-3 p-3 transition-colors sm:p-4 rounded-xl bg-muted/40 hover:bg-muted/60 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div>
-                <h4 className="font-medium">{doc.topic}</h4>
-                <p className="text-sm text-muted-foreground">
+              {/* Title + date */}
+              <div className="min-w-0">
+                <h4 className="font-medium truncate">{doc.topic}</h4>
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   {formatRelativeTime(doc.createdAt)}
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
+              {/* Badge + action */}
+              <div className="flex items-center gap-2 shrink-0">
                 <Badge
                   variant={
                     doc.status === "approved"
@@ -102,9 +102,9 @@ function DocumentGroup({ title, Icon, documents }) {
                         : "secondary"
                   }
                 >
-                  {doc.status == "PENDING"
+                  {doc.status === "PENDING"
                     ? "Непрегледано"
-                    : doc.status == "APPROVED"
+                    : doc.status === "APPROVED"
                       ? "Прифатено"
                       : "Одбиено"}
                 </Badge>
@@ -126,7 +126,7 @@ function DocumentGroup({ title, Icon, documents }) {
                       },
                     })
                   }
-                  className="px-3 py-1 text-sm border rounded-lg bg-card hover:bg-muted"
+                  className="px-3 py-1 text-sm border rounded-lg bg-card hover:bg-muted whitespace-nowrap"
                 >
                   Прегледај
                 </button>
@@ -142,7 +142,6 @@ function DocumentGroup({ title, Icon, documents }) {
 function RoleDropdown({ currentRole, userId, onRoleChange, disabled = false }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const isAdmin = currentRole === "ADMIN";
 
   const handleSelect = async (role) => {
@@ -170,7 +169,7 @@ function RoleDropdown({ currentRole, userId, onRoleChange, disabled = false }) {
       <button
         onClick={() => !isAdmin && setOpen((v) => !v)}
         disabled={loading || disabled || isAdmin}
-        className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-medium border border-border transition-colors ${
+        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs sm:text-sm font-medium border border-border transition-colors ${
           isAdmin ? "opacity-60 cursor-not-allowed" : "hover:bg-muted/60"
         } ${roleStyles[currentRole] ?? "bg-muted text-muted-foreground"}`}
       >
@@ -178,8 +177,8 @@ function RoleDropdown({ currentRole, userId, onRoleChange, disabled = false }) {
           <span className="w-3 h-3 border-2 border-current rounded-full border-t-transparent animate-spin" />
         ) : (
           <>
-            <ShieldCheck className="w-3.5 h-3.5" />
-            {currentRole}
+            <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden sm:inline">{currentRole}</span>
             {!isAdmin && <ChevronDown className="w-3 h-3 opacity-60" />}
           </>
         )}
@@ -213,20 +212,19 @@ function UserManagementSection({ onBack }) {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [page, setPage] = useState(0); // backend is 0-indexed
+  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
+  const [actionLoading, setActionLoading] = useState({});
 
-  // Debounce search input by 400ms
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
-      setPage(0); // reset to first page on new search
+      setPage(0);
     }, 400);
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Fetch whenever page or debounced search changes
   useEffect(() => {
     fetchUsers(page, debouncedSearch);
   }, [page, debouncedSearch]);
@@ -244,8 +242,6 @@ function UserManagementSection({ onBack }) {
       setLoading(false);
     }
   };
-
-  const [actionLoading, setActionLoading] = useState({}); // tracks per-user in-flight actions
 
   const handleBlockToggle = async (user) => {
     setActionLoading((prev) => ({ ...prev, [user.id]: true }));
@@ -281,23 +277,24 @@ function UserManagementSection({ onBack }) {
     }
   };
 
-  const displayPage = page + 1; // 1-indexed for display
   const rangeStart = page * PAGE_SIZE + 1;
   const rangeEnd = Math.min((page + 1) * PAGE_SIZE, totalElements);
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
+      {/* Section header */}
+      <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Управување со корисници</h2>
+          <h2 className="text-xl font-bold sm:text-2xl">
+            Управување со корисници
+          </h2>
           <p className="text-sm text-muted-foreground">
             Блокирање, одблокирање и менување на улоги
           </p>
         </div>
-
         <button
           onClick={onBack}
-          className="px-4 py-2 text-sm transition-colors border rounded-xl border-border bg-card hover:bg-muted"
+          className="self-start px-4 py-2 text-sm transition-colors border sm:self-auto rounded-xl border-border bg-card hover:bg-muted"
         >
           Назад
         </button>
@@ -315,20 +312,19 @@ function UserManagementSection({ onBack }) {
         />
       </div>
 
-      <div className="p-6 border bg-card border-border rounded-2xl card-elevated">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-5">
+      <div className="p-4 border sm:p-6 bg-card border-border rounded-2xl card-elevated">
+        {/* Card header */}
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10 text-primary">
               <Users className="w-5 h-5" />
             </div>
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-base font-semibold sm:text-lg">
               Корисници ({totalElements})
             </h2>
           </div>
-
           {!loading && totalElements > 0 && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               {rangeStart}–{rangeEnd} од {totalElements}
             </p>
           )}
@@ -351,18 +347,18 @@ function UserManagementSection({ onBack }) {
         ) : (
           <>
             <div className="mb-5 space-y-3">
-              {users.map((user, index) => (
+              {users.map((user) => (
                 <div
                   key={user.id}
-                  className={`flex items-center relative justify-between p-4 rounded-xl transition-colors ${
+                  className={`flex items-center justify-between p-3 sm:p-4 rounded-xl transition-colors gap-2 ${
                     user.blocked
                       ? "bg-destructive/5 border border-destructive/20"
                       : "bg-muted/40 hover:bg-muted/60"
                   }`}
                 >
-                  {/* Avatar + Info */}
-                  <div className="flex items-center min-w-0 gap-3">
-                    <div className="flex items-center justify-center overflow-hidden text-sm font-semibold rounded-full w-9 h-9 bg-primary/10 text-primary shrink-0">
+                  {/* Avatar + info */}
+                  <div className="flex items-center min-w-0 gap-2.5 sm:gap-3">
+                    <div className="flex items-center justify-center w-8 h-8 overflow-hidden text-sm font-semibold rounded-full sm:w-9 sm:h-9 bg-primary/10 text-primary shrink-0">
                       {user.avatarUrl ? (
                         <img
                           src={user.avatarUrl}
@@ -378,21 +374,21 @@ function UserManagementSection({ onBack }) {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-medium truncate">
+                      <h4 className="text-sm font-medium truncate">
                         {user.firstName && user.lastName
                           ? `${user.firstName} ${user.lastName}`
                           : "—"}
                       </h4>
-                      <p className="text-sm truncate text-muted-foreground">
+                      <p className="text-xs truncate text-muted-foreground">
                         {user.email}
                       </p>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 ml-3 shrink-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     {user.blocked && (
-                      <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-destructive/10 text-destructive">
+                      <span className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-destructive/10 text-destructive">
                         <Ban className="w-3 h-3" />
                         Блокиран
                       </span>
@@ -408,7 +404,7 @@ function UserManagementSection({ onBack }) {
                     <button
                       onClick={() => handleBlockToggle(user)}
                       disabled={!!actionLoading[user.id]}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                      className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                         user.blocked
                           ? "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"
                           : "border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20"
@@ -418,12 +414,12 @@ function UserManagementSection({ onBack }) {
                         <span className="w-3.5 h-3.5 border-2 border-current rounded-full border-t-transparent animate-spin" />
                       ) : user.blocked ? (
                         <>
-                          <UnlockKeyhole className="w-3.5 h-3.5" />
+                          <UnlockKeyhole className="w-3.5 h-3.5 shrink-0" />
                           <span className="hidden sm:inline">Одблокирај</span>
                         </>
                       ) : (
                         <>
-                          <Ban className="w-3.5 h-3.5" />
+                          <Ban className="w-3.5 h-3.5 shrink-0" />
                           <span className="hidden sm:inline">Блокирај</span>
                         </>
                       )}
@@ -433,32 +429,55 @@ function UserManagementSection({ onBack }) {
               ))}
             </div>
 
-            {/* Pagination controls */}
+            {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between pt-4 border-t border-border">
+              <div className="flex items-center justify-between gap-2 pt-4 border-t border-border">
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg border-border bg-card hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 text-sm border rounded-lg border-border bg-card hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  Претходна
+                  <span className="hidden sm:inline">Претходна</span>
                 </button>
 
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }, (_, i) => i).map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => setPage(p)}
-                      className={`w-8 h-8 text-sm rounded-lg transition-colors ${
-                        p === page
-                          ? "bg-primary text-primary-foreground font-semibold"
-                          : "hover:bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {p + 1}
-                    </button>
-                  ))}
+                {/* Page numbers — show limited set on mobile */}
+                <div className="flex flex-wrap items-center justify-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i)
+                    .filter(
+                      (p) =>
+                        totalPages <= 5 ||
+                        Math.abs(p - page) <= 1 ||
+                        p === 0 ||
+                        p === totalPages - 1,
+                    )
+                    .reduce((acc, p, idx, arr) => {
+                      if (idx > 0 && p - arr[idx - 1] > 1) acc.push("...");
+                      acc.push(p);
+                      return acc;
+                    }, [])
+                    .map((p, idx) =>
+                      p === "..." ? (
+                        <span
+                          key={`e-${idx}`}
+                          className="px-1 text-xs text-muted-foreground"
+                        >
+                          …
+                        </span>
+                      ) : (
+                        <button
+                          key={p}
+                          onClick={() => setPage(p)}
+                          className={`w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm rounded-lg transition-colors ${
+                            p === page
+                              ? "bg-primary text-primary-foreground font-semibold"
+                              : "hover:bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {p + 1}
+                        </button>
+                      ),
+                    )}
                 </div>
 
                 <button
@@ -466,9 +485,9 @@ function UserManagementSection({ onBack }) {
                     setPage((p) => Math.min(totalPages - 1, p + 1))
                   }
                   disabled={page === totalPages - 1}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg border-border bg-card hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 text-sm border rounded-lg border-border bg-card hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Следна
+                  <span className="hidden sm:inline">Следна</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -485,7 +504,7 @@ export default function AdminPage() {
   const [pending, setPending] = useState([]);
   const [approved, setApproved] = useState([]);
   const [rejected, setRejected] = useState([]);
-  const [showUserManagemenr, setShowUserManagement] = useState(false);
+  const [showUserManagement, setShowUserManagement] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -502,7 +521,6 @@ export default function AdminPage() {
       const pen = await getPendingDocuments();
       const appr = await getApprovedDocuments();
       const rej = await getRejectedDocuments();
-
       setPending(pen);
       setApproved(appr);
       setRejected(rej);
@@ -511,55 +529,40 @@ export default function AdminPage() {
     }
   };
 
-  const approvedDocuments = {
-    text: approved.filter((d) => d.type === "TEXT"),
-    audio: approved.filter((d) => d.type === "AUDIO"),
-    video: approved.filter((d) => d.type === "VIDEO"),
-    image: approved.filter((d) => d.type === "IMAGE"),
-  };
+  const byType = (arr) => ({
+    text: arr.filter((d) => d.type === "TEXT"),
+    audio: arr.filter((d) => d.type === "AUDIO"),
+    video: arr.filter((d) => d.type === "VIDEO"),
+    image: arr.filter((d) => d.type === "IMAGE"),
+  });
 
-  const rejectedDocuments = {
-    text: rejected.filter((d) => d.type === "TEXT"),
-    audio: rejected.filter((d) => d.type === "AUDIO"),
-    video: rejected.filter((d) => d.type === "VIDEO"),
-    image: rejected.filter((d) => d.type === "IMAGE"),
-  };
+  const approvedDocuments = byType(approved);
+  const rejectedDocuments = byType(rejected);
+  const pendingDocuments = byType(pending);
 
-  const pendingDocuments = {
-    text: pending.filter((d) => d.type === "TEXT"),
-    audio: pending.filter((d) => d.type === "AUDIO"),
-    video: pending.filter((d) => d.type === "VIDEO"),
-    image: pending.filter((d) => d.type === "IMAGE"),
-  };
+  const sum = (obj) => Object.values(obj).reduce((a, b) => a + b.length, 0);
+  const totalPending = sum(pendingDocuments);
+  const totalChecked = sum(approvedDocuments) + sum(rejectedDocuments);
 
-  const totalPending =
-    pendingDocuments.text.length +
-    pendingDocuments.audio.length +
-    pendingDocuments.video.length +
-    pendingDocuments.image.length;
-
-  const totalChecked =
-    approvedDocuments.text.length +
-    approvedDocuments.audio.length +
-    approvedDocuments.video.length +
-    approvedDocuments.image.length +
-    rejectedDocuments.text.length +
-    rejectedDocuments.audio.length +
-    rejectedDocuments.video.length +
-    rejectedDocuments.image.length;
+  const activeTitle =
+    activeSection === "pending"
+      ? "Документи за проверка"
+      : activeSection === "approved"
+        ? "Одобрени документи"
+        : "Одбиени документи";
 
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar activeButtonIndex={2} />
 
-      <main className="flex-1 pb-20 overflow-auto lg:pb-0 pt-14 lg:pt-0">
-        <div className="max-w-6xl p-6 mx-auto md:p-8">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold md:text-3xl">
+      <main className="flex-1 pb-20 overflow-auto pt-14 lg:pt-0 lg:pb-0">
+        <div className="max-w-6xl px-4 py-6 mx-auto sm:px-6 md:px-8 md:py-8">
+          {/* Page heading */}
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-xl font-bold sm:text-2xl md:text-3xl">
               Преглед и проверка
             </h1>
-
-            <p className="mt-1 text-muted-foreground">
+            <p className="mt-1 text-sm sm:text-base text-muted-foreground">
               Управување со документи
             </p>
           </div>
@@ -567,7 +570,8 @@ export default function AdminPage() {
           {/* ── Home: no active section ── */}
           {!activeSection && (
             <>
-              <div className="grid grid-cols-2 gap-4 mb-8 lg:grid-cols-4">
+              {/* Stat cards */}
+              <div className="grid grid-cols-2 gap-3 mb-6 sm:gap-4 sm:mb-8 lg:grid-cols-2">
                 <StatCard
                   title="Проверени"
                   statValue={totalChecked}
@@ -576,7 +580,6 @@ export default function AdminPage() {
                   textClass="text-primary"
                   i={0}
                 />
-
                 <StatCard
                   title="Чекаат проверка"
                   statValue={totalPending}
@@ -587,7 +590,8 @@ export default function AdminPage() {
                 />
               </div>
 
-              <div className="grid gap-6 mb-8 md:grid-cols-2">
+              {/* Section cards — single column on mobile, 2-col on md+ */}
+              <div className="grid grid-cols-1 gap-4 mb-6 sm:gap-6 sm:mb-8 md:grid-cols-2">
                 <SectionCard
                   title="Документи за проверка"
                   Icon={Clock3}
@@ -595,144 +599,92 @@ export default function AdminPage() {
                   color="bg-warning/10 text-warning"
                   onClick={() => setActiveSection("pending")}
                 />
-              </div>
-
-              <div className="grid gap-6 mb-8 md:grid-cols-2">
                 <SectionCard
                   title="Одобрени документи"
                   Icon={CheckCircle2}
-                  count={
-                    approvedDocuments.text.length +
-                    approvedDocuments.audio.length +
-                    approvedDocuments.video.length +
-                    approvedDocuments.image.length
-                  }
+                  count={sum(approvedDocuments)}
                   color="bg-primary/10 text-primary"
                   onClick={() => setActiveSection("approved")}
                 />
-              </div>
-
-              <div className="grid gap-6 mb-8 md:grid-cols-2">
                 <SectionCard
                   title="Одбиени документи"
                   Icon={XCircle}
-                  count={
-                    rejectedDocuments.text.length +
-                    rejectedDocuments.audio.length +
-                    rejectedDocuments.video.length +
-                    rejectedDocuments.image.length
-                  }
+                  count={sum(rejectedDocuments)}
                   color="bg-destructive/10 text-destructive"
                   onClick={() => setActiveSection("rejected")}
                 />
-              </div>
-
-              {/* ── User Management card ── */}
-              {showUserManagemenr && (
-                <div className="grid gap-6 mb-8 md:grid-cols-2">
+                {showUserManagement && (
                   <button
                     onClick={() => setActiveSection("users")}
                     className="w-full text-left transition-all duration-200 border bg-card border-border rounded-2xl card-elevated hover:scale-[1.01] hover:bg-muted/30"
                   >
-                    <div className="flex items-center justify-between p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-xl bg-secondary/10 text-secondary-foreground">
-                          <Users className="w-6 h-6" />
+                    <div className="flex items-center justify-between p-4 sm:p-6">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="p-2.5 sm:p-3 text-green-700 bg-green-100 rounded-xl">
+                          <Users className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold">
+                          <h3 className="text-base font-semibold sm:text-lg">
                             Управување со корисници
                           </h3>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs sm:text-sm text-muted-foreground">
                             Блокирај, одблокирај, смени улога
                           </p>
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                      <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
                     </div>
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </>
           )}
 
           {/* ── Document sections ── */}
           {activeSection && activeSection !== "users" && (
             <>
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold">
-                    {activeSection === "pending" && "Документи за проверка"}
-                    {activeSection === "approved" && "Одобрени документи"}
-                    {activeSection === "rejected" && "Одбиени документи"}
+                  <h2 className="text-xl font-bold sm:text-2xl">
+                    {activeTitle}
                   </h2>
-
                   <p className="text-sm text-muted-foreground">
                     Документите се организирани по тип
                   </p>
                 </div>
-
                 <button
                   onClick={() => setActiveSection(null)}
-                  className="px-4 py-2 text-sm transition-colors border rounded-xl border-border bg-card hover:bg-muted"
+                  className="self-start px-4 py-2 text-sm transition-colors border sm:self-auto rounded-xl border-border bg-card hover:bg-muted"
                 >
                   Назад
                 </button>
               </div>
 
-              <div className="grid gap-6">
-                <DocumentGroup
-                  title="Текст документи"
-                  Icon={FileText}
-                  documents={
-                    activeSection === "pending"
-                      ? pendingDocuments.text
-                      : activeSection === "approved"
-                        ? approvedDocuments.text
-                        : rejectedDocuments.text
-                  }
-                />
-
-                <DocumentGroup
-                  title="Аудио документи"
-                  Icon={Mic}
-                  documents={
-                    activeSection === "pending"
-                      ? pendingDocuments.audio
-                      : activeSection === "approved"
-                        ? approvedDocuments.audio
-                        : rejectedDocuments.audio
-                  }
-                />
-
-                <DocumentGroup
-                  title="Видео документи"
-                  Icon={Video}
-                  documents={
-                    activeSection === "pending"
-                      ? pendingDocuments.video
-                      : activeSection === "approved"
-                        ? approvedDocuments.video
-                        : rejectedDocuments.video
-                  }
-                />
-
-                <DocumentGroup
-                  title="Слики"
-                  Icon={Video}
-                  documents={
-                    activeSection === "pending"
-                      ? pendingDocuments.image
-                      : activeSection === "approved"
-                        ? approvedDocuments.image
-                        : rejectedDocuments.image
-                  }
-                />
+              <div className="grid gap-4 sm:gap-6">
+                {[
+                  { title: "Текст документи", Icon: FileText, key: "text" },
+                  { title: "Аудио документи", Icon: Mic, key: "audio" },
+                  { title: "Видео документи", Icon: Video, key: "video" },
+                  { title: "Слики", Icon: Video, key: "image" },
+                ].map(({ title, Icon, key }) => (
+                  <DocumentGroup
+                    key={key}
+                    title={title}
+                    Icon={Icon}
+                    documents={
+                      activeSection === "pending"
+                        ? pendingDocuments[key]
+                        : activeSection === "approved"
+                          ? approvedDocuments[key]
+                          : rejectedDocuments[key]
+                    }
+                  />
+                ))}
               </div>
             </>
           )}
 
-          {/* ── User Management section ── */}
+          {/* ── User Management ── */}
           {activeSection === "users" && (
             <UserManagementSection onBack={() => setActiveSection(null)} />
           )}

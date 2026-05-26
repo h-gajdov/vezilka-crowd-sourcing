@@ -1,12 +1,4 @@
-import {
-  Star,
-  Upload,
-  Gift,
-  SquareCheckBig,
-  Mic,
-  FileText,
-  Video,
-} from "lucide-react";
+import { Star, Upload, Gift, SquareCheckBig } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import StatCard from "../components/StatCard";
 import RecentActivities from "../components/RecentActivities";
@@ -18,8 +10,8 @@ export default function DashboardPage() {
   const user = getUser();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const [canReview, setCanReview] = useState(null);
+
   useEffect(() => {
     const fetchReviewStatus = async () => {
       try {
@@ -43,22 +35,33 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
-  return loading ? (
-    <div></div>
-  ) : (
+  if (loading) return <div />;
+
+  return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar></Sidebar>
-      <main className="flex-1 pb-20 overflow-auto lg:pb-0 pt-14 lg:pt-0">
-        <div className="max-w-6xl p-6 mx-auto md:p-8">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold md:text-3xl">
+      <Sidebar />
+
+      {/*
+        On mobile:
+          - pt-14 clears the fixed top bar
+          - pb-20 clears the fixed bottom nav
+        On desktop (lg+):
+          - pt-0 / pb-0 — sidebar is inline, no fixed bars
+      */}
+      <main className="flex-1 pb-20 overflow-auto pt-14 lg:pt-0 lg:pb-0">
+        <div className="max-w-6xl px-4 py-6 mx-auto sm:px-6 md:px-8 md:py-8">
+          {/* Page heading */}
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-xl font-bold sm:text-2xl md:text-3xl">
               Добредојде назад, {user.firstName} 👋
             </h1>
-            <p className="mt-1 text-muted-foreground">
+            <p className="mt-1 text-sm sm:text-base text-muted-foreground">
               Еве преглед на твоите придонеси
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-4 mb-8 lg:grid-cols-4">
+
+          {/* Stat cards — 2 cols on mobile, 4 on lg */}
+          <div className="grid grid-cols-2 gap-3 mb-6 sm:gap-4 sm:mb-8 lg:grid-cols-4">
             <StatCard
               title="Вкупно поени"
               statValue={stats.totalPoints}
@@ -66,7 +69,7 @@ export default function DashboardPage() {
               bgClass="bg-warning/10"
               textClass="text-warning"
               i={0}
-            ></StatCard>
+            />
             <StatCard
               title="Прикачувања"
               statValue={stats.totalUploads}
@@ -74,7 +77,7 @@ export default function DashboardPage() {
               bgClass="bg-primary/10"
               textClass="text-primary"
               i={1}
-            ></StatCard>
+            />
             <StatCard
               title="Достапни награди"
               statValue={stats.totalRewards}
@@ -82,7 +85,7 @@ export default function DashboardPage() {
               bgClass="bg-accent/10"
               textClass="text-accent"
               i={2}
-            ></StatCard>
+            />
             <StatCard
               title="Ранг"
               statValue={"#" + stats.rank}
@@ -90,33 +93,38 @@ export default function DashboardPage() {
               bgClass="bg-destructive/10"
               textClass="text-destructive"
               i={3}
-            ></StatCard>
+            />
           </div>
-          <div className="flex gap-4 mb-8 md:grid-cols-2">
+
+          {/* Quick-action cards — stack on mobile, row on sm+ */}
+          <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:gap-4 sm:mb-8">
             <a className="flex-1 block" href="/upload">
-              <div className="flex items-center gap-4 p-6 border bg-card border-border rounded-xl card-elevated">
-                <div className="p-3 rounded-xl bg-primary/10 text-primary">
-                  <Upload />
+              <div className="flex items-center gap-3 p-4 border sm:gap-4 sm:p-6 bg-card border-border rounded-xl card-elevated">
+                <div className="p-2.5 sm:p-3 rounded-xl bg-primary/10 text-primary shrink-0">
+                  <Upload className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <div>
-                  <h3 className="font-semibold">Прикачи содржина</h3>
-                  <p className="text-sm text-muted-foreground">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold sm:text-base">
+                    Прикачи содржина
+                  </h3>
+                  <p className="text-xs truncate sm:text-sm text-muted-foreground">
                     Сподели текст, аудио или видео податоци
                   </p>
                 </div>
               </div>
             </a>
+
             {canReview && (
               <a className="flex-1 block" href="/admin">
-                {/* This button will only be available for admins */}
-                <div className="flex items-center gap-4 p-6 border bg-card border-border rounded-xl card-elevated">
-                  <div className="p-3 rounded-xl bg-accent/10 text-accent">
-                    <SquareCheckBig />
+                <div className="flex items-center gap-3 p-4 border sm:gap-4 sm:p-6 bg-card border-border rounded-xl card-elevated">
+                  <div className="p-2.5 sm:p-3 rounded-xl bg-accent/10 text-accent shrink-0">
+                    <SquareCheckBig className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-
-                  <div>
-                    <h3 className="font-semibold">Прегледај содржина</h3>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-semibold sm:text-base">
+                      Прегледај содржина
+                    </h3>
+                    <p className="text-xs truncate sm:text-sm text-muted-foreground">
                       Помогни во проверката на поставените податоци
                     </p>
                   </div>
@@ -124,7 +132,8 @@ export default function DashboardPage() {
               </a>
             )}
           </div>
-          <RecentActivities></RecentActivities>
+
+          <RecentActivities />
         </div>
       </main>
     </div>

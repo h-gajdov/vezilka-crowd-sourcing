@@ -19,28 +19,13 @@ import { normalizeUrls } from "../utils/normalizeUrls.js";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-// Помошна функција за генерирање на логиката со точки (...) за пагинација
 const generatePagination = (currentPage, totalPages) => {
-  // currentPage доаѓа како 0-индексирано, но за логикава го користиме како 1-индексирано
   const current = currentPage + 1;
   const total = totalPages;
-
-  // Ако има помалку или точно 7 страници, прикажи ги сите
-  if (total <= 7) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-
-  // Ако сме на почеток
-  if (current <= 3) {
-    return [1, 2, 3, 4, "...", total - 1, total];
-  }
-
-  // Ако сме на крај
-  if (current >= total - 2) {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (current <= 3) return [1, 2, 3, 4, "...", total - 1, total];
+  if (current >= total - 2)
     return [1, 2, "...", total - 3, total - 2, total - 1, total];
-  }
-
-  // Ако сме некаде на средина
   return [1, "...", current - 1, current, current + 1, "...", total];
 };
 
@@ -50,12 +35,9 @@ export default function PublicFilesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [isDownloading, setIsDownloading] = useState(null);
-
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(12);
   const [totalPages, setTotalPages] = useState(1);
-
-  // Состојба за полето за скокање до одредена страна
   const [jumpPage, setJumpPage] = useState("");
 
   useEffect(() => {
@@ -80,7 +62,6 @@ export default function PublicFilesPage() {
       );
       if (!res.ok) throw new Error("Failed to fetch public files");
       const data = await res.json();
-
       if (data.content) {
         setFiles(data.content);
         setTotalPages(data.totalPages || 1);
@@ -139,20 +120,18 @@ export default function PublicFilesPage() {
     if (!fileId) return;
     try {
       setIsDownloading(fileId);
-      const downloadApiUrl = `${BACKEND_URL}/api/content/download?id=${fileId}`;
-      const res = await fetch(downloadApiUrl);
+      const res = await fetch(
+        `${BACKEND_URL}/api/content/download?id=${fileId}`,
+      );
       if (!res.ok) throw new Error("Датотеката не може да се преземе.");
-
       const blob = await res.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
-
       const link = document.createElement("a");
       link.href = downloadUrl;
       link.download = originalFileName || topic || "download";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
       window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error("Грешка при преземање:", error);
@@ -172,7 +151,7 @@ export default function PublicFilesPage() {
       const val = parseInt(jumpPage);
       if (!isNaN(val) && val >= 1 && val <= totalPages) {
         setPageNumber(val - 1);
-        setJumpPage(""); // Исчисти го полето откако ќе скокне
+        setJumpPage("");
       } else {
         alert(`Внеси број од 1 до ${totalPages}`);
       }
@@ -183,16 +162,20 @@ export default function PublicFilesPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Navbar />
 
-      <main className="flex-1 pt-24 pb-20 md:pt-32">
-        <div className="max-w-6xl p-6 mx-auto md:p-8">
-          <div className="flex flex-col gap-4 mb-8 md:flex-row md:items-center md:justify-between">
+      <main className="flex-1 pt-20 pb-16 sm:pt-24 sm:pb-20 md:pt-32">
+        <div className="max-w-6xl px-4 py-6 mx-auto sm:px-6 md:px-8 md:py-8">
+          {/* Header row — stacks on mobile, side-by-side on md+ */}
+          <div className="flex flex-col gap-4 mb-6 sm:mb-8 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-2xl font-bold md:text-3xl">Јавни податоци</h1>
-              <p className="mt-1 text-muted-foreground">
+              <h1 className="text-xl font-bold sm:text-2xl md:text-3xl">
+                Јавни податоци
+              </h1>
+              <p className="mt-1 text-sm sm:text-base text-muted-foreground">
                 Прегледај и преземи јавно достапни податоци
               </p>
             </div>
 
+            {/* Search — full width on mobile, fixed on md+ */}
             <div className="relative w-full md:w-80">
               <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
               <input
@@ -200,7 +183,7 @@ export default function PublicFilesPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Пребарај..."
-                className="flex w-full h-10 px-3 py-2 pl-10 text-base border rounded-md border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm"
+                className="flex w-full h-10 px-3 py-2 pl-10 text-sm border rounded-md border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
             </div>
           </div>
@@ -211,7 +194,8 @@ export default function PublicFilesPage() {
             </div>
           ) : files.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {/* File cards grid */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
                 {files.map((file) => {
                   const { Icon, color, bg, label } = getIconConfig(file.type);
                   const isCurrentDownloading = isDownloading === file.id;
@@ -219,9 +203,10 @@ export default function PublicFilesPage() {
                   return (
                     <div
                       key={file.id}
-                      className="flex flex-col h-full p-5 border bg-card border-border rounded-2xl card-elevated"
+                      className="flex flex-col h-full p-4 border sm:p-5 bg-card border-border rounded-2xl card-elevated"
                     >
-                      <div className="flex items-center justify-between mb-4">
+                      {/* Type icon + badge */}
+                      <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div className={`p-2.5 rounded-xl ${bg} ${color}`}>
                           <Icon className="w-5 h-5" />
                         </div>
@@ -230,8 +215,9 @@ export default function PublicFilesPage() {
                         </span>
                       </div>
 
+                      {/* Title */}
                       <h3
-                        className="text-lg font-semibold line-clamp-1"
+                        className="text-base font-semibold line-clamp-1 sm:text-lg"
                         title={file.topic}
                       >
                         {file.topic || "Без наслов"}
@@ -246,12 +232,13 @@ export default function PublicFilesPage() {
                         </p>
                       )}
 
-                      <p className="mt-2 text-sm text-muted-foreground line-clamp-2 flex-1 min-h-[2.5rem]">
+                      <p className="mt-2 text-xs sm:text-sm text-muted-foreground line-clamp-2 flex-1 min-h-[2.5rem]">
                         {file.description ||
                           "Нема додадено опис за оваа содржина."}
                       </p>
 
-                      <div className="mt-5 mb-5 text-xs text-muted-foreground">
+                      {/* Meta */}
+                      <div className="mt-4 mb-4 text-xs text-muted-foreground">
                         {/* Uploader row */}
                         <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50 mb-3">
                           {file.avatarUrl ? (
@@ -277,7 +264,7 @@ export default function PublicFilesPage() {
                           </div>
                         </div>
 
-                        {/* Dialect + meta row */}
+                        {/* Dialect + score + date */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
                             <span className="font-medium text-foreground">
@@ -286,7 +273,6 @@ export default function PublicFilesPage() {
                             <span>{file.dialect?.name || "Стандарден"}</span>
                           </div>
                         </div>
-
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center gap-1.5">
                             <Star className="w-3.5 h-3.5 text-warning" />
@@ -327,11 +313,14 @@ export default function PublicFilesPage() {
                 })}
               </div>
 
-              {/* Комплетна пагинација (Димензии, Бројки и Скокање) */}
-              <div className="flex flex-col items-center justify-between gap-6 p-5 mt-10 border xl:flex-row bg-card border-border rounded-xl">
-                {/* Избор на елементи по страница */}
+              {/* Pagination bar */}
+              <div className="flex flex-col items-center gap-4 p-4 mt-8 border sm:p-5 sm:gap-5 sm:mt-10 xl:flex-row xl:justify-between bg-card border-border rounded-xl">
+                {/* Page size selector */}
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <label htmlFor="pageSizeSelect" className="font-medium">
+                  <label
+                    htmlFor="pageSizeSelect"
+                    className="font-medium whitespace-nowrap"
+                  >
                     Прикажи по:
                   </label>
                   <select
@@ -340,7 +329,7 @@ export default function PublicFilesPage() {
                     onChange={handlePageSizeChange}
                     className="px-3 py-1 pr-8 border rounded-md appearance-none cursor-pointer h-9 border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-4 h-4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9' /%3E%3C/svg%3E")`,
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9' /%3E%3C/svg%3E")`,
                       backgroundRepeat: "no-repeat",
                       backgroundPosition: "right 0.5rem center",
                       backgroundSize: "1em",
@@ -354,9 +343,9 @@ export default function PublicFilesPage() {
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="flex flex-col items-center gap-6 sm:flex-row">
-                    {/* Бројки и копчиња за страници */}
-                    <div className="flex items-center gap-1">
+                  <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-5">
+                    {/* Page number buttons — shrink ellipsis on small screens */}
+                    <div className="flex items-center gap-0.5 sm:gap-1 flex-wrap justify-center">
                       <Button
                         variant="outline"
                         size="icon"
@@ -371,7 +360,7 @@ export default function PublicFilesPage() {
                           page === "..." ? (
                             <span
                               key={`ellipsis-${index}`}
-                              className="px-2 text-muted-foreground"
+                              className="px-1 text-muted-foreground sm:px-2"
                             >
                               ...
                             </span>
@@ -402,9 +391,9 @@ export default function PublicFilesPage() {
                       </Button>
                     </div>
 
-                    {/* Скокни до одредена страница */}
+                    {/* Jump to page */}
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>Оди на:</span>
+                      <span className="whitespace-nowrap">Оди на:</span>
                       <input
                         type="number"
                         min={1}
@@ -421,11 +410,14 @@ export default function PublicFilesPage() {
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center p-10 text-center border border-dashed rounded-2xl border-border bg-card/50">
+            /* Empty state */
+            <div className="flex flex-col items-center justify-center p-8 text-center border border-dashed sm:p-10 rounded-2xl border-border bg-card/50">
               <div className="p-4 mb-4 rounded-full bg-muted">
                 <Inbox className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-medium">Не се пронајдени датотеки</h3>
+              <h3 className="text-base font-medium sm:text-lg">
+                Не се пронајдени датотеки
+              </h3>
               <p className="max-w-sm mx-auto mt-1 text-sm text-muted-foreground">
                 Нема јавни податоци кои одговараат на твоето пребарување. Обиди
                 се со други клучни зборови.
