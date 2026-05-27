@@ -500,6 +500,10 @@ function UserManagementSection({ onBack }) {
 }
 
 export default function AdminPage() {
+  useEffect(() => {
+    document.title = "Преглед на податоци";
+  }, []);
+
   const [activeSection, setActiveSection] = useState(null);
   const [pending, setPending] = useState([]);
   const [approved, setApproved] = useState([]);

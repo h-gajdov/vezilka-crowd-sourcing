@@ -19,6 +19,10 @@ export default function HomePage() {
   const location = useLocation();
 
   useEffect(() => {
+    document.title = "Почетна";
+  }, []);
+
+  useEffect(() => {
     if (location.hash) {
       const element = document.getElementById(location.hash.replace("#", ""));
       if (element) {

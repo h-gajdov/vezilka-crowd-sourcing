@@ -164,7 +164,11 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-lg border-border">
       <div className="container flex items-center justify-between h-16 px-4 mx-auto">
         <NavLink to="/" className="text-xl font-bold text-gradient">
-          Везилка
+          {/* Везилка */}
+          <img
+            className="object-contain w-auto h-8"
+            src="/public/vezilka-logo-horizontal-transparent.png"
+          ></img>
         </NavLink>
 
         {/* Desktop */}

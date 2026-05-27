@@ -1,6 +1,6 @@
 import { ArrowRight, Lock, Mail, AlertCircle, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { saveAuth } from "../utils/auth";
 
 export default function LoginPage() {
@@ -12,6 +12,10 @@ export default function LoginPage() {
     email: "",
     password: "",
   });
+
+  useEffect(() => {
+    document.title = "Најава";
+  }, []);
 
   const handleChange = (e) => {
     setError("");

@@ -117,13 +117,17 @@ const renderContent = () => {
 };
 
 export default function AdminReviewPage() {
+  useEffect(() => {
+    document.title = "Преглед на податоци";
+  }, []);
+
   const location = useLocation();
   const navigate = useNavigate();
 
-  const document = location.state?.document;
+  const documentObj = location.state?.document;
 
   const [status, setStatus] = useState(
-    document?.status?.toLowerCase() || "pending",
+    documentObj?.status?.toLowerCase() || "pending",
   );
   const [comment, setComment] = useState("");
   const [qualityScore, setQualityScore] = useState(3);
@@ -133,14 +137,15 @@ export default function AdminReviewPage() {
   const [transcriptionError, setTranscriptionError] = useState(false);
 
   const isMediaType = ["AUDIO", "VIDEO"].includes(
-    (document?.type || "").toUpperCase(),
+    (documentObj?.type || "").toUpperCase(),
   );
 
   useEffect(() => {
     const fetchLatestReviewer = async () => {
       try {
-        const result = await getLatestReview(document.id);
+        const result = await getLatestReview(documentObj.id);
         setLatestReviewer(result.reviewerFullName);
+        setComment(result.comment);
       } catch (err) {
         setLatestReviewer("");
       }
@@ -150,7 +155,7 @@ export default function AdminReviewPage() {
       setTranscriptionLoading(true);
       setTranscriptionError(false);
       try {
-        const result = await getTranscription(document.id);
+        const result = await getTranscription(documentObj.id);
         setTranscription(result?.text ?? result ?? "");
       } catch (err) {
         console.error(err);
@@ -162,7 +167,7 @@ export default function AdminReviewPage() {
 
     const fetchQualityScore = async () => {
       try {
-        const result = await getQualityScore(document.id);
+        const result = await getQualityScore(documentObj.id);
         setQualityScore(result);
       } catch (err) {
         setQualityScore(3);
@@ -172,9 +177,9 @@ export default function AdminReviewPage() {
     fetchTranscription();
     fetchLatestReviewer();
     fetchQualityScore();
-  }, [document?.id]);
+  }, [documentObj?.id]);
 
-  if (!document) {
+  if (!documentObj) {
     return (
       <div className="p-10 text-center text-muted-foreground">
         No document selected
@@ -190,12 +195,12 @@ export default function AdminReviewPage() {
     );
   }
 
-  const Icon = typeIcons[document?.type] || FileText;
+  const Icon = typeIcons[documentObj?.type] || FileText;
 
   const handleApprove = async () => {
     try {
       const toSend = {
-        id: document.id,
+        id: documentObj.id,
         comment,
         qualityScore,
         transcription,
@@ -210,7 +215,7 @@ export default function AdminReviewPage() {
   const handleReject = async () => {
     try {
       const toSend = {
-        id: document.id,
+        id: documentObj.id,
         comment,
         qualityScore,
         ...(isMediaType && { transcription }),
@@ -256,11 +261,11 @@ export default function AdminReviewPage() {
 
                     <div>
                       <h2 className="text-xl font-semibold">
-                        {document.title}
+                        {documentObj.title}
                       </h2>
 
                       <p className="text-sm text-muted-foreground">
-                        {document.type}
+                        {documentObj.type}
                       </p>
                     </div>
                   </div>
@@ -281,12 +286,12 @@ export default function AdminReviewPage() {
                 <div className="grid gap-4 mt-8 md:grid-cols-2">
                   <div className="flex items-center gap-3 text-sm">
                     <User className="w-4 h-4 text-muted-foreground" />
-                    <span>{document.uploadedBy}</span>
+                    <span>{documentObj.uploadedBy}</span>
                   </div>
 
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <span>{document.createdAt}</span>
+                    <span>{documentObj.createdAt}</span>
                   </div>
                 </div>
 
@@ -295,7 +300,7 @@ export default function AdminReviewPage() {
 
                   <div className="p-4 border rounded-xl bg-muted/30 border-border">
                     <p className="text-sm leading-relaxed text-muted-foreground">
-                      {document.description}
+                      {documentObj.description}
                     </p>
                   </div>
                 </div>
@@ -419,11 +424,11 @@ export default function AdminReviewPage() {
                     <span className="text-muted-foreground">Тип</span>
 
                     <span>
-                      {document.type == "IMAGE"
+                      {documentObj.type == "IMAGE"
                         ? "Слика"
-                        : document.type == "TEXT"
+                        : documentObj.type == "TEXT"
                           ? "Текст"
-                          : document.type == "AUDIO"
+                          : documentObj.type == "AUDIO"
                             ? "Аудио"
                             : "Видео"}
                     </span>

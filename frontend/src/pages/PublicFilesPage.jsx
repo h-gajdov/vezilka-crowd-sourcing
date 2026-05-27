@@ -41,6 +41,10 @@ export default function PublicFilesPage() {
   const [jumpPage, setJumpPage] = useState("");
 
   useEffect(() => {
+    document.title = "Податоци";
+  }, []);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       if (searchTerm !== debouncedSearchTerm) {
         setDebouncedSearchTerm(searchTerm);

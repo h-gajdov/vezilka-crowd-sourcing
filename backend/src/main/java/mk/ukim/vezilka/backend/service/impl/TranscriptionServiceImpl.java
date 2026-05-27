@@ -25,7 +25,9 @@ public class TranscriptionServiceImpl implements TranscriptionService {
 
     @Override
     public Transcription editTranscriptionOfContent(Long contentId, String text) {
-        Transcription transcription = transcriptionRepository.getByContent_Id(contentId).orElseThrow(() -> new IllegalArgumentException("Content with " + contentId + " can't be found!"));
+        Transcription transcription = transcriptionRepository.getByContent_Id(contentId).orElse(null);
+
+        if (transcription == null) return transcription;
 
         transcription.setText(text);
 

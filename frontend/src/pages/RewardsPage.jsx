@@ -2,6 +2,7 @@ import Sidebar from "../components/Sidebar.jsx";
 import { Star, BookOpen, Award, Zap, Gift } from "lucide-react";
 import Button from "../components/Button.jsx";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 export default function RewardsPage() {
   const rewards = [
@@ -34,6 +35,10 @@ export default function RewardsPage() {
       description: "Маица и стикери од заедницата на Везилка.",
     },
   ];
+
+  useEffect(() => {
+    document.title = "Награди";
+  }, []);
 
   const user = { points: 1000 };
 

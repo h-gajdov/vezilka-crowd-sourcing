@@ -13,9 +13,11 @@ import java.time.LocalDateTime;
 public class ReviewResponse {
     private LocalDateTime createdAt;
     private String reviewerFullName;
+    private String comment;
 
     public ReviewResponse(Review review) {
         this.createdAt = review.getCreatedAt();
         this.reviewerFullName = review.getReviewer().getFullName();
+        this.comment = review.getComment();
     }
 }

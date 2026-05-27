@@ -13,6 +13,10 @@ export default function DashboardPage() {
   const [canReview, setCanReview] = useState(null);
 
   useEffect(() => {
+    document.title = "Контролна табла";
+  }, []);
+
+  useEffect(() => {
     const fetchReviewStatus = async () => {
       try {
         const result = await userCanReview();

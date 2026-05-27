@@ -31,6 +31,10 @@ const EditProfilePage = () => {
   const [phone, setPhone] = useState("");
   const [emailNotif, setEmailNotif] = useState(false);
 
+  useEffect(() => {
+    document.title = "Уреди профил";
+  }, []);
+
   const handleSavePersonal = async (e) => {
     e.preventDefault();
     try {
@@ -146,14 +150,14 @@ const EditProfilePage = () => {
                 <div>
                   <h2 className="font-semibold">Лични информации</h2>
                   <p className="text-sm text-muted-foreground">
-                    Ажурирај ime, е-пошта и контакт детали
+                    Ажурирај име, е-пошта и контакт детали
                   </p>
                 </div>
 
                 {/* 1-col on mobile, 2-col on md+ */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="first-name">Ime</Label>
+                    <Label htmlFor="first-name">Име</Label>
                     <Input
                       id="first-name"
                       value={firstName}

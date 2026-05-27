@@ -28,6 +28,10 @@ export default function RegisterPage() {
   const [isSendingCode, setIsSendingCode] = useState(false);
 
   useEffect(() => {
+    document.title = "Регистрација";
+  }, []);
+
+  useEffect(() => {
     let timer;
     if (cooldown > 0) {
       timer = setInterval(() => {

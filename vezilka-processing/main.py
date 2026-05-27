@@ -1,11 +1,3 @@
-# from fastapi import FastAPI
-
-# app = FastAPI()
-
-# @app.get("/")
-# def read_root():
-#     return "API is running!"
-
 from db.utils import *
 from extract.extract import *
 from transform.transforms import *
@@ -14,8 +6,11 @@ from datasets import Dataset
 from dataclasses import asdict
 from pathlib import Path
 from itertools import chain
+from datetime import datetime
 
 import shutil
+
+load_dotenv('../')
 
 cache_dir = Path("./data/hf_cache_temp").resolve()
 output_dir = Path("./data/dataset").resolve()
@@ -54,6 +49,12 @@ def dataset_generator():
 
 dataset = Dataset.from_generator(dataset_generator, cache_dir=cache_dir)
 
+username = os.getenv("HF_USERNAME")
+
+timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+dataset_name = f"vezilka-crowd-sourcing-{timestamp}"
+
 dataset.save_to_disk(str(output_dir))
+dataset.push_to_hub(f'{username}/{dataset_name}')
 
 shutil.rmtree(cache_dir, ignore_errors=True)

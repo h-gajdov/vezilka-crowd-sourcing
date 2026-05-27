@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import {
   FileText,
   Upload,
@@ -258,6 +258,10 @@ export default function UploadPage() {
   const removeEntry = (id) => {
     setEntries((prev) => prev.filter((e) => e.id !== id));
   };
+
+  useEffect(() => {
+    document.title = "Постави податоци";
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-background">

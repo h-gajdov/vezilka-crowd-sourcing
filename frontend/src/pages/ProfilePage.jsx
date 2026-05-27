@@ -50,6 +50,10 @@ export default function ProfilePage() {
   const [contributions, setContributions] = useState([]);
 
   useEffect(() => {
+    document.title = "Профил";
+  }, []);
+
+  useEffect(() => {
     getUserUploads()
       .then((data) => {
         const mapped = data.map((upload) => ({

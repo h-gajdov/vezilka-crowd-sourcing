@@ -33,7 +33,8 @@ def transform_pdf(file_path, url, row):
                 chunk=i,
                 topic=row.topic,
                 description=row.description,
-                file_type=row.type
+                file_type=row.type,
+                dialect=row.dialect
             )
 
 def transform_docx_text(docx_path):
@@ -78,7 +79,8 @@ def transform_document(file_path, url, row):
                 chunk=i,
                 topic=row.topic,
                 description=row.description,
-                file_type=row.type
+                file_type=row.type,
+                dialect=row.dialect
             )
 
     except Exception as e:
@@ -101,7 +103,8 @@ def transform_txt(file_path, url, row):
             chunk=i,
             topic=row.topic,
             description=row.description,
-            file_type=row.type
+            file_type=row.type,
+            dialect=row.dialect
         )
 
 def transform_pptx(file_path, url, row):
@@ -132,7 +135,8 @@ def transform_pptx(file_path, url, row):
                 chunk=i,
                 topic=row.topic,
                 description=row.description,
-                file_type=row.type
+                file_type=row.type,
+                dialect=row.dialect
             )
 
 def transform_image(file_path, url, row):
@@ -148,7 +152,8 @@ def transform_image(file_path, url, row):
             chunk=i,
             topic=row.topic,
             description=row.description,
-            file_type=row.type
+            file_type=row.type,
+            dialect=row.dialect
         )
 
 def transform_video_audio(file_path, url, row):
@@ -164,7 +169,8 @@ def transform_video_audio(file_path, url, row):
             chunk=i,
             topic=row.topic,
             description=row.description,
-            file_type=row.type
+            file_type=row.type,
+            dialect=row.dialect
         )
 
 def download_file(url):

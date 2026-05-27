@@ -14,6 +14,6 @@ def preprocess(img: Image.Image) -> Image.Image:
     img = img.filter(ImageFilter.MinFilter(3))
     img = img.filter(ImageFilter.MedianFilter(3))
 
-    processed_path = "./data/preprocessed_debug.png"
-    img.save(processed_path)
+    # processed_path = "./data/preprocessed_debug.png"
+    # img.save(processed_path)
     return img

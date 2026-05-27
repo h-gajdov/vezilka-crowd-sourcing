@@ -82,7 +82,11 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
               }}
               className="text-xl font-bold text-gradient"
             >
-              Везилка
+              {/* Везилка */}
+              <img
+                className="object-contain w-auto h-8"
+                src="/public/vezilka-logo-horizontal-transparent.png"
+              ></img>
             </a>
             <button
               onClick={() => setCollapsed(!collapsed)}
