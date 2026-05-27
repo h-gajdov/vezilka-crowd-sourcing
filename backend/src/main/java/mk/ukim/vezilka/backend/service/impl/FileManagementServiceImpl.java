@@ -5,6 +5,7 @@ import mk.ukim.vezilka.backend.model.enums.ContentStatus;
 import mk.ukim.vezilka.backend.model.enums.ContentType;
 import mk.ukim.vezilka.backend.model.enums.ReviewDecision;
 import mk.ukim.vezilka.backend.model.exceptions.ContentNotFoundException;
+import software.amazon.awssdk.core.sync.RequestBody;
 import mk.ukim.vezilka.backend.model.exceptions.InvalidFileException;
 import mk.ukim.vezilka.backend.repository.ActivityTypeRepository;
 import mk.ukim.vezilka.backend.repository.ContentRepository;
@@ -16,6 +17,8 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,17 +39,22 @@ public class FileManagementServiceImpl implements FileManagementService {
     private final ActivityService activityService;
     private final ReviewRepository reviewRepository;
     private final DialectService dialectService;
+    private final S3Client s3Client;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    public FileManagementServiceImpl(ContentRepository contentRepository, UserService userService, TranscriptionService transcriptionService, ActivityTypeRepository activityTypeRepository, ActivityService activityService, ReviewRepository reviewRepository, DialectService dialectService) {
+    @Value("${railway.bucket.name}")
+    private String bucketName;
+
+    public FileManagementServiceImpl(ContentRepository contentRepository, UserService userService, TranscriptionService transcriptionService, ActivityTypeRepository activityTypeRepository, ActivityService activityService, ReviewRepository reviewRepository, DialectService dialectService, S3Client s3Client) {
         this.contentRepository = contentRepository;
         this.userService = userService;
         this.transcriptionService = transcriptionService;
         this.activityService = activityService;
         this.reviewRepository = reviewRepository;
         this.dialectService = dialectService;
+        this.s3Client = s3Client;
     }
 
     private Content createContentEntity(String originalFilename, ContentType type, String fileUrl, String topic, Long dialectId, String description, String transcription, boolean isPrivate, AppUser user) {
@@ -85,6 +93,14 @@ public class FileManagementServiceImpl implements FileManagementService {
                 .toString()
                 .replace("\\", "/");
 
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(finalFilename)
+                .contentType(file.getContentType())
+                .build();
+        s3Client.putObject(putObjectRequest,
+                RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+
         Path userStoragePath = Paths.get(uploadDir)
                 .resolve("users")
                 .resolve(String.valueOf(user.getId()))
@@ -94,7 +110,8 @@ public class FileManagementServiceImpl implements FileManagementService {
         Path targetLocation = userStoragePath.resolve(finalFilename);
         file.transferTo(targetLocation);
 
-        Content content = createContentEntity(originalFilename, contentType, relativePath, topic, dialectId, description, transcription, isPrivate, user);
+//        Content content = createContentEntity(originalFilename, contentType, relativePath, topic, dialectId, description, transcription, isPrivate, user);
+        Content content = createContentEntity(originalFilename, contentType, finalFilename, topic, dialectId, description, transcription, isPrivate, user);
         ActivityType activityType = activityService.getActivityByName(contentType.name());
         activityService.logUpload(user, content, activityType);
         return content;

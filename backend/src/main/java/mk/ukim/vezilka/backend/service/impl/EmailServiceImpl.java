@@ -26,6 +26,6 @@ public class EmailServiceImpl implements EmailService {
         message.setText("Здраво,\n\nТвојот код за потврда е: " + code + "\n\nОвој код е валиден 10 минути.\n\nПоздрав,\nТимот на Везилка");
 
         mailSender.send(message);
-
+        System.out.println("SENT");
     }
 }
