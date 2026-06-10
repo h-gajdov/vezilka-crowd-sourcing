@@ -71,15 +71,20 @@ public class FileManagementServiceImpl implements FileManagementService {
         if (file.isEmpty()) {
             throw new InvalidFileException();
         }
-
         AppUser user = userService.getUserByEmail(userEmail);
-
         ContentType contentType = determineContentType(file.getContentType());
-
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
         String finalFilename = UUID.randomUUID() + "_" + originalFilename;
-        String relativePath = Paths.get("users").resolve(String.valueOf(user.getId())).resolve("data").resolve(finalFilename).toString().replace("\\", "/");
+        String relativePath = Paths
+                .get("media")
+                .resolve("uploads")
+                .resolve("users")
+                .resolve(String.valueOf(user.getId()))
+                .resolve("data")
+                .resolve(finalFilename)
+                .toString()
+                .replace("\\", "/");
 
         Path filePath = Paths.get(uploadDir).resolve(relativePath).normalize();
 
@@ -98,9 +103,7 @@ public class FileManagementServiceImpl implements FileManagementService {
     public Resource loadFileAsResource(String path) {
         try {
             Path basePath = Paths.get(uploadDir).toAbsolutePath().normalize();
-
             Path filePath = basePath.resolve(path).normalize();
-
             if (!filePath.startsWith(basePath)) {
                 throw new RuntimeException("Access denied (invalid path)");
             }
