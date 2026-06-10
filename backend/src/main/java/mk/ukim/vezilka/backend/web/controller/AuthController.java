@@ -11,6 +11,7 @@ import mk.ukim.vezilka.backend.web.request.EmailVerificationRequest;
 import mk.ukim.vezilka.backend.web.request.LoginRequest;
 import mk.ukim.vezilka.backend.web.request.RegisterRequest;
 import mk.ukim.vezilka.backend.web.response.AuthResponse;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -37,16 +38,21 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         try {
             AppUser user = authService.register(request.getFirstName(), request.getLastName(), request.getEmail(), request.getPassword(), request.getCode());
-            String jwtToken = jwtUtil.generateToken(user.getEmail());
+            String token = jwtUtil.generateToken(
+                    user.getEmail(),
+                    user.getRole().name()
+            );
+
             AuthResponse response = new AuthResponse(
-                    jwtToken,
+                    token,
                     user.getFirstName(),
                     user.getLastName(),
                     user.getEmail(),
                     user.getAvatarUrl(),
                     !user.getRole().equals(Role.USER),
-                    LocalDateTime.now()
+                    user.getCreatedAt()
             );
+
             return ResponseEntity.ok(response);
         } catch (UserAlreadyExistsException ex) {
             return ResponseEntity.status(409).build();
@@ -59,12 +65,16 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         try {
             AppUser user = authService.login(request.getEmail(), request.getPassword());
-            if(user.isBlocked())
+            if (user.isBlocked())
                 return ResponseEntity.status(423).build();
 
-            String jwtToken = jwtUtil.generateToken(user.getEmail());
+            String token = jwtUtil.generateToken(
+                    user.getEmail(),
+                    user.getRole().name()
+            );
+
             AuthResponse response = new AuthResponse(
-                    jwtToken,
+                    token,
                     user.getFirstName(),
                     user.getLastName(),
                     user.getEmail(),
@@ -72,6 +82,7 @@ public class AuthController {
                     !user.getRole().equals(Role.USER),
                     user.getCreatedAt()
             );
+
             return ResponseEntity.ok(response);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().build();
@@ -92,7 +103,7 @@ public class AuthController {
     public ResponseEntity<AuthResponse> getUserByToken(Authentication authentication) {
         String email = authentication.getName();
         AppUser user = userService.getUserByEmail(email);
-        String jwtToken = jwtUtil.generateToken(user.getEmail());
+        String jwtToken = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
         AuthResponse response = new AuthResponse(user, jwtToken);
         return ResponseEntity.ok(response);
     }

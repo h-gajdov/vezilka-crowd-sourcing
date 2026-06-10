@@ -1,45 +1,56 @@
 package mk.ukim.vezilka.backend.util;
 
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String SECRET;
+    private final Key key;
 
     @Value("${application.security.jwt.expiration}")
-    private int EXPIRATION;
+    private long EXPIRATION;
 
-    public String generateToken(String email) {
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    }
+
+    // CREATE TOKEN
+    public String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(Keys.hmacShaKeyFor(SECRET.getBytes()))
+                .signWith(key)
                 .compact();
     }
 
-    public String extractUsername(String token) {
+    // PARSE TOKEN
+    private Claims getClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SECRET.getBytes())
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
+    }
+
+    public String extractUsername(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    public String extractRole(String token) {
+        return getClaims(token).get("role", String.class);
     }
 
     public boolean isValid(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(SECRET.getBytes())
-                    .build()
-                    .parseClaimsJws(token);
+            getClaims(token);
             return true;
         } catch (Exception e) {
             return false;

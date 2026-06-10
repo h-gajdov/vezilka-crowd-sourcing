@@ -73,50 +73,48 @@ public class FileManagementServiceImpl implements FileManagementService {
         }
 
         AppUser user = userService.getUserByEmail(userEmail);
+
         ContentType contentType = determineContentType(file.getContentType());
+
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        String finalFilename = UUID.randomUUID().toString() + "_" + originalFilename;
-        String relativePath = Paths.get("media")
-                .resolve("uploads")
-                .resolve("users")
-                .resolve(String.valueOf(user.getId()))
-                .resolve("data")
-                .resolve(finalFilename)
-                .toString()
-                .replace("\\", "/");
 
-        Path userStoragePath = Paths.get(uploadDir)
-                .resolve("users")
-                .resolve(String.valueOf(user.getId()))
-                .resolve("data");
-        Files.createDirectories(userStoragePath);
+        String finalFilename = UUID.randomUUID() + "_" + originalFilename;
+        String relativePath = Paths.get("users").resolve(String.valueOf(user.getId())).resolve("data").resolve(finalFilename).toString().replace("\\", "/");
 
-        Path targetLocation = userStoragePath.resolve(finalFilename);
-        file.transferTo(targetLocation);
+        Path filePath = Paths.get(uploadDir).resolve(relativePath).normalize();
+
+        Files.createDirectories(filePath.getParent());
+        file.transferTo(filePath);
 
         Content content = createContentEntity(originalFilename, contentType, relativePath, topic, dialectId, description, transcription, isPrivate, user);
+
         ActivityType activityType = activityService.getActivityByName(contentType.name());
         activityService.logUpload(user, content, activityType);
+
         return content;
     }
 
     @Override
     public Resource loadFileAsResource(String path) {
         try {
-            Path targetLocation = Paths.get(path).normalize();
+            Path basePath = Paths.get(uploadDir).toAbsolutePath().normalize();
 
-            if (!targetLocation.startsWith(this.uploadDir.substring(2))) {
-                throw new RuntimeException("Безбедносна грешка: Обид за пристап надвор од дозволениот директориум.");
+            Path filePath = basePath.resolve(path).normalize();
+
+            if (!filePath.startsWith(basePath)) {
+                throw new RuntimeException("Access denied (invalid path)");
             }
 
-            Resource resource = new UrlResource(targetLocation.toUri());
-            if (resource.exists() && resource.isReadable()) {
-                return resource;
-            } else {
-                throw new RuntimeException("Датотеката не е пронајдена или не може да се прочита: " + path);
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new RuntimeException("File not found: " + path);
             }
+
+            return resource;
+
         } catch (Exception ex) {
-            throw new RuntimeException("Грешка при вчитување на датотеката: " + path, ex);
+            throw new RuntimeException("Error loading file: " + path, ex);
         }
     }
 
@@ -137,25 +135,25 @@ public class FileManagementServiceImpl implements FileManagementService {
     }
 
     @Override
-    public List<Content> getApprovedFiles(){
+    public List<Content> getApprovedFiles() {
         return contentRepository.getContentByStatus(ContentStatus.APPROVED).orElse(new ArrayList<>());
     }
 
     @Override
-    public List<Content> getRejectedFiles(){
+    public List<Content> getRejectedFiles() {
         return contentRepository.getContentByStatus(ContentStatus.REJECTED).orElse(new ArrayList<>());
     }
 
     @Override
-    public Review acceptFile(Long id,String comment,String email, Double qualityScore, String transcription){
-        Content content=contentRepository.getContentById(id).orElse(null);
-        AppUser user=userService.getUserByEmail(email);
+    public Review acceptFile(Long id, String comment, String email, Double qualityScore, String transcription) {
+        Content content = contentRepository.getContentById(id).orElse(null);
+        AppUser user = userService.getUserByEmail(email);
 
         content.setStatus(ContentStatus.APPROVED);
         content.setQualityScore(qualityScore);
         transcriptionService.editTranscriptionOfContent(id, transcription);
 
-        Review newReview=new Review();
+        Review newReview = new Review();
         newReview.setComment(comment);
         newReview.setDecision(ReviewDecision.APPROVE);
         newReview.setContent(content);
@@ -167,15 +165,15 @@ public class FileManagementServiceImpl implements FileManagementService {
     }
 
     @Override
-    public Review rejectFile(Long id,String comment, String email, Double qualityScore, String transcription){
-        Content content=contentRepository.getContentById(id).orElse(null);
-        AppUser user=userService.getUserByEmail(email);
+    public Review rejectFile(Long id, String comment, String email, Double qualityScore, String transcription) {
+        Content content = contentRepository.getContentById(id).orElse(null);
+        AppUser user = userService.getUserByEmail(email);
 
         content.setStatus(ContentStatus.REJECTED);
         content.setQualityScore(qualityScore);
         transcriptionService.editTranscriptionOfContent(id, transcription);
 
-        Review newReview=new Review();
+        Review newReview = new Review();
         newReview.setComment(comment);
         newReview.setDecision(ReviewDecision.REJECT);
         newReview.setContent(content);

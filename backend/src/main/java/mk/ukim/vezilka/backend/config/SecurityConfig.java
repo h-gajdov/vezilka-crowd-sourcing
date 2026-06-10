@@ -27,6 +27,8 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/**").authenticated()
+                        .requestMatchers("/api/files/upload").authenticated()
+                        .requestMatchers("/api/files/**").hasAnyRole("ADMIN", "REVIEWER")
                         .anyRequest().permitAll()
                 )
                 .headers(headers -> headers
