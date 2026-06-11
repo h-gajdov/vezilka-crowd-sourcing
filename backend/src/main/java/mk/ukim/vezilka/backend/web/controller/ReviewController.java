@@ -19,11 +19,9 @@ public class ReviewController {
     }
 
     @GetMapping("/content/{contentId}")
-    public ResponseEntity<?> getReviewByContentId(@PathVariable Long contentId) {
+    public ResponseEntity<ReviewResponse> getReviewByContentId(@PathVariable Long contentId) {
         Review review = reviewService.getLatestReviewByContentId(contentId).orElse(null);
-
         if(review == null) return ResponseEntity.badRequest().build();
-
         ReviewResponse response = new ReviewResponse(review);
         return ResponseEntity.ok(response);
     }

@@ -17,7 +17,7 @@ public class DashboardStatsResponse {
     public DashboardStatsResponse(AppUser user) {
         totalPoints = user.getPoints();
         totalUploads = user.getUploads().size();
-        totalRewards = 0; // mock totalRewards
-        rank = 42; //mock rank
+        totalRewards = 0;
+        rank = 42;
     }
 }

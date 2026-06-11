@@ -19,7 +19,7 @@ public class Annotation {
     @ManyToOne
     private Content content;
 
-    private String label; // can be made enum
+    private String label;
     private String value;
 
     private LocalDateTime createdAt;

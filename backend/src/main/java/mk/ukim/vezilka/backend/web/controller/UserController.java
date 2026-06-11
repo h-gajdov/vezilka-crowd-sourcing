@@ -43,7 +43,6 @@ public class UserController {
     public ResponseEntity<UserResponse> getUserDetails(Authentication authentication) {
         String email = authentication.getName();
         AppUser user = userService.getUserByEmail(email);
-
         UserResponse response = new UserResponse(user);
         return ResponseEntity.ok(response);
     }
@@ -109,7 +108,7 @@ public class UserController {
         String email = authentication.getName();
         AppUser user = userService.getUserByEmail(email);
         if(user.getRole() != Role.ADMIN)
-            throw new InvalidParameterException("You don't have the permissions for this!");
+            throw new InvalidParameterException("You do not have admin permissions!");
 
         Page<AppUser> users = userService.getUsersPaginated(search, pageNumber, pageSize);
         Page<UserResponse> responses = users.map(UserResponse::new);
@@ -121,7 +120,7 @@ public class UserController {
         String email = authentication.getName();
         AppUser user = userService.getUserByEmail(email);
         if(user.getRole() != Role.ADMIN)
-            throw new InvalidParameterException("You don't have the permissions for this!");
+            throw new InvalidParameterException("You do not have admin permissions!");
 
         return ResponseEntity.ok(Role.values());
     }
@@ -132,7 +131,7 @@ public class UserController {
         String email = authentication.getName();
         AppUser user = userService.getUserByEmail(email);
         if(user.getRole() != Role.ADMIN)
-            throw new InvalidParameterException("You don't have the permissions for this!");
+            throw new InvalidParameterException("You do not have admin permissions!");
 
         AppUser userToBlock = userService.blockUser(emailToBlock);
         UserResponse response = new UserResponse(userToBlock);
@@ -145,7 +144,7 @@ public class UserController {
         String email = authentication.getName();
         AppUser user = userService.getUserByEmail(email);
         if(user.getRole() != Role.ADMIN)
-            throw new InvalidParameterException("You don't have the permissions for this!");
+            throw new InvalidParameterException("You do not have admin permissions!");
 
         AppUser userToUnblock = userService.unblockUser(emailToUnblock);
         UserResponse response = new UserResponse(userToUnblock);
@@ -158,7 +157,7 @@ public class UserController {
         String email = authentication.getName();
         AppUser user = userService.getUserByEmail(email);
         if(user.getRole() != Role.ADMIN)
-            throw new InvalidParameterException("You don't have the permissions for this!");
+            throw new InvalidParameterException("You do not have admin permissions!");
 
         AppUser changedUser = userService.changeRole(request.getEmail(), request.getRole());
         UserResponse response = new UserResponse(changedUser);

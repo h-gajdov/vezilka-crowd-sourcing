@@ -8,6 +8,7 @@ import mk.ukim.vezilka.backend.model.Content;
 import java.util.List;
 
 public interface ActivityService {
+
     Activity logUpload(AppUser user, Content content, ActivityType uploadType);
 
     List<Activity> getActivitiesByUser(AppUser user,int pageSize);

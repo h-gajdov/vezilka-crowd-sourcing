@@ -20,7 +20,6 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    // CREATE TOKEN
     public String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
@@ -31,7 +30,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // PARSE TOKEN
     private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)

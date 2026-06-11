@@ -39,8 +39,6 @@ public class AppUser {
 
     private LocalDateTime createdAt;
 
-//    For testing if there are already users in the db uncomment the line below
-//    @Column(columnDefinition = "bool default true")
     private boolean isVerified;
 
     @Column(columnDefinition = "bool default false")

@@ -20,7 +20,7 @@ public class PointsTransaction {
     private AppUser user;
 
     private int amount;
-    private String reason; // can be enum
+    private String reason;
 
     private LocalDateTime createdAt;
 }
