@@ -9,6 +9,7 @@ import mk.ukim.vezilka.backend.service.TranscriptionService;
 import mk.ukim.vezilka.backend.web.request.ReviewRequest;
 import mk.ukim.vezilka.backend.service.FileValidationService;
 import mk.ukim.vezilka.backend.web.request.UploadContentRequest;
+import mk.ukim.vezilka.backend.web.response.ContentResponse;
 import mk.ukim.vezilka.backend.web.response.ReviewResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -60,21 +61,24 @@ public class FileManagementController {
     }
 
     @GetMapping("/pending")
-    public ResponseEntity<List<Content>> getPendingFiles() {
+    public ResponseEntity<List<ContentResponse>> getPendingFiles() {
         List<Content> result = fileManagementService.getPendingFiles();
-        return ResponseEntity.ok(result);
+        List<ContentResponse> responses=result.stream().map(x->new ContentResponse(x)).toList();
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/approved")
-    public ResponseEntity<List<Content>> getApprovedFiles() {
+    public ResponseEntity<List<ContentResponse>> getApprovedFiles() {
         List<Content> result = fileManagementService.getApprovedFiles();
-        return ResponseEntity.ok(result);
+        List<ContentResponse> responses=result.stream().map(x->new ContentResponse(x)).toList();
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/rejected")
-    public ResponseEntity<List<Content>> getRejectedFiles() {
+    public ResponseEntity<List<ContentResponse>> getRejectedFiles() {
         List<Content> result = fileManagementService.getRejectedFiles();
-        return ResponseEntity.ok(result);
+        List<ContentResponse> responses=result.stream().map(x->new ContentResponse(x)).toList();
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping("/reject")
