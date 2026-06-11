@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { clearAuth, getToken, setToken, refreshUserObj } from "../utils/auth";
 import { jwtDecode } from "jwt-decode";
 
-// How many seconds before expiry to show the warning popup
 const WARN_BEFORE_SECONDS = 60;
 
 function SessionExpiryModal({ secondsLeft, onExtend, onLogout }) {

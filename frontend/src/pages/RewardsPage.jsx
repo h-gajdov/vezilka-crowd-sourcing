@@ -48,7 +48,7 @@ export default function RewardsPage() {
 
       <main className="flex-1 pb-20 overflow-auto pt-14 lg:pt-0 lg:pb-0">
         <div className="max-w-6xl px-4 py-6 mx-auto sm:px-6 md:px-8 md:py-8">
-          {/* Page heading */}
+         
           <div className="mb-6 sm:mb-8">
             <h1 className="text-xl font-bold sm:text-2xl md:text-3xl">
               Награди
@@ -58,7 +58,6 @@ export default function RewardsPage() {
             </p>
           </div>
 
-          {/* Points balance card */}
           <div className="p-4 mb-6 border bg-card border-border rounded-2xl sm:p-6 md:p-8 sm:mb-8 card-elevated">
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="p-2.5 sm:p-3 rounded-xl bg-warning/10 text-warning shrink-0">
@@ -75,7 +74,6 @@ export default function RewardsPage() {
             </div>
           </div>
 
-          {/* Reward cards grid */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
             {rewards.map((reward, i) => {
               const canAfford = user.points >= reward.cost;
@@ -99,7 +97,6 @@ export default function RewardsPage() {
                         {reward.description}
                       </p>
 
-                      {/* Cost + button — stack on very small screens */}
                       <div className="flex flex-col gap-2 mt-4 sm:flex-row sm:items-center sm:justify-between">
                         <span className="inline-flex items-center gap-1 text-sm font-medium">
                           <Star className="w-3.5 h-3.5 text-warning shrink-0" />

@@ -45,16 +45,8 @@ export default function DashboardPage() {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
 
-      {/*
-        On mobile:
-          - pt-14 clears the fixed top bar
-          - pb-20 clears the fixed bottom nav
-        On desktop (lg+):
-          - pt-0 / pb-0 — sidebar is inline, no fixed bars
-      */}
       <main className="flex-1 pb-20 overflow-auto pt-14 lg:pt-0 lg:pb-0">
         <div className="max-w-6xl px-4 py-6 mx-auto sm:px-6 md:px-8 md:py-8">
-          {/* Page heading */}
           <div className="mb-6 sm:mb-8">
             <h1 className="text-xl font-bold sm:text-2xl md:text-3xl">
               Добредојде назад, {user.firstName} 👋
@@ -64,7 +56,6 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          {/* Stat cards — 2 cols on mobile, 4 on lg */}
           <div className="grid grid-cols-2 gap-3 mb-6 sm:gap-4 sm:mb-8 lg:grid-cols-4">
             <StatCard
               title="Вкупно поени"
@@ -100,7 +91,6 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Quick-action cards — stack on mobile, row on sm+ */}
           <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:gap-4 sm:mb-8">
             <a className="flex-1 block" href="/upload">
               <div className="flex items-center gap-3 p-4 border sm:gap-4 sm:p-6 bg-card border-border rounded-xl card-elevated">

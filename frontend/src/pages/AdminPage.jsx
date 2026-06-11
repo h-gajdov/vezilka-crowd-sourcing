@@ -83,7 +83,6 @@ function DocumentGroup({ title, Icon, documents }) {
               key={index}
               className="flex flex-col gap-3 p-3 transition-colors sm:p-4 rounded-xl bg-muted/40 hover:bg-muted/60 sm:flex-row sm:items-center sm:justify-between"
             >
-              {/* Title + date */}
               <div className="min-w-0">
                 <h4 className="font-medium truncate">{doc.topic}</h4>
                 <p className="text-xs sm:text-sm text-muted-foreground">
@@ -91,7 +90,6 @@ function DocumentGroup({ title, Icon, documents }) {
                 </p>
               </div>
 
-              {/* Badge + action */}
               <div className="flex items-center gap-2 shrink-0">
                 <Badge
                   variant={
@@ -282,7 +280,6 @@ function UserManagementSection({ onBack }) {
 
   return (
     <>
-      {/* Section header */}
       <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold sm:text-2xl">
@@ -300,7 +297,6 @@ function UserManagementSection({ onBack }) {
         </button>
       </div>
 
-      {/* Search */}
       <div className="relative mb-6">
         <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
         <input
@@ -313,7 +309,6 @@ function UserManagementSection({ onBack }) {
       </div>
 
       <div className="p-4 border sm:p-6 bg-card border-border rounded-2xl card-elevated">
-        {/* Card header */}
         <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -356,7 +351,6 @@ function UserManagementSection({ onBack }) {
                       : "bg-muted/40 hover:bg-muted/60"
                   }`}
                 >
-                  {/* Avatar + info */}
                   <div className="flex items-center min-w-0 gap-2.5 sm:gap-3">
                     <div className="flex items-center justify-center w-8 h-8 overflow-hidden text-sm font-semibold rounded-full sm:w-9 sm:h-9 bg-primary/10 text-primary shrink-0">
                       {user.avatarUrl ? (
@@ -385,7 +379,6 @@ function UserManagementSection({ onBack }) {
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     {user.blocked && (
                       <span className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-destructive/10 text-destructive">
@@ -429,7 +422,6 @@ function UserManagementSection({ onBack }) {
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between gap-2 pt-4 border-t border-border">
                 <button
@@ -441,7 +433,6 @@ function UserManagementSection({ onBack }) {
                   <span className="hidden sm:inline">Претходна</span>
                 </button>
 
-                {/* Page numbers — show limited set on mobile */}
                 <div className="flex flex-wrap items-center justify-center gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i)
                     .filter(
@@ -561,7 +552,6 @@ export default function AdminPage() {
 
       <main className="flex-1 pb-20 overflow-auto pt-14 lg:pt-0 lg:pb-0">
         <div className="max-w-6xl px-4 py-6 mx-auto sm:px-6 md:px-8 md:py-8">
-          {/* Page heading */}
           <div className="mb-6 sm:mb-8">
             <h1 className="text-xl font-bold sm:text-2xl md:text-3xl">
               Преглед и проверка
@@ -571,10 +561,8 @@ export default function AdminPage() {
             </p>
           </div>
 
-          {/* ── Home: no active section ── */}
           {!activeSection && (
             <>
-              {/* Stat cards */}
               <div className="grid grid-cols-2 gap-3 mb-6 sm:gap-4 sm:mb-8 lg:grid-cols-2">
                 <StatCard
                   title="Проверени"
@@ -594,7 +582,6 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* Section cards — single column on mobile, 2-col on md+ */}
               <div className="grid grid-cols-1 gap-4 mb-6 sm:gap-6 sm:mb-8 md:grid-cols-2">
                 <SectionCard
                   title="Документи за проверка"
@@ -644,7 +631,6 @@ export default function AdminPage() {
             </>
           )}
 
-          {/* ── Document sections ── */}
           {activeSection && activeSection !== "users" && (
             <>
               <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between">
@@ -688,7 +674,6 @@ export default function AdminPage() {
             </>
           )}
 
-          {/* ── User Management ── */}
           {activeSection === "users" && (
             <UserManagementSection onBack={() => setActiveSection(null)} />
           )}

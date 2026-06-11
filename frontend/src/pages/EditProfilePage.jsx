@@ -102,7 +102,7 @@ const EditProfilePage = () => {
 
       <main className="flex-1 pb-20 overflow-auto pt-14 lg:pt-0 lg:pb-0">
         <div className="max-w-3xl px-4 py-6 mx-auto sm:px-6 md:px-8 md:py-8">
-          {/* Page header */}
+         
           <div className="mb-6 sm:mb-8">
             <Link
               to="/profile"
@@ -119,7 +119,7 @@ const EditProfilePage = () => {
           </div>
 
           <Tabs defaultValue="personal" className="w-full">
-            {/* Tab list — scrollable on very small screens */}
+           
             <TabsList className="grid w-full h-auto grid-cols-3">
               <TabsTrigger
                 value="personal"
@@ -141,7 +141,6 @@ const EditProfilePage = () => {
               </TabsTrigger>
             </TabsList>
 
-            {/* ── Personal info tab ── */}
             <TabsContent value="personal" className="mt-4 sm:mt-6">
               <form
                 onSubmit={handleSavePersonal}
@@ -154,7 +153,6 @@ const EditProfilePage = () => {
                   </p>
                 </div>
 
-                {/* 1-col on mobile, 2-col on md+ */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="first-name">Име</Label>
@@ -203,7 +201,6 @@ const EditProfilePage = () => {
                   />
                 </div>
 
-                {/* Save button — full-width on mobile, auto on sm+ */}
                 <div className="flex justify-end pt-1">
                   <Button type="submit" className="w-full sm:w-auto">
                     Зачувај промени
@@ -212,7 +209,6 @@ const EditProfilePage = () => {
               </form>
             </TabsContent>
 
-            {/* ── Profile picture tab ── */}
             <TabsContent value="picture" className="mt-4 sm:mt-6">
               <div className="p-4 space-y-5 border sm:p-6 bg-card border-border rounded-2xl card-elevated">
                 <div>
@@ -222,7 +218,6 @@ const EditProfilePage = () => {
                   </p>
                 </div>
 
-                {/* Stack vertically on mobile, row on sm+ */}
                 <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:gap-6">
                   <Avatar
                     key={user.avatarUrl ?? "no-avatar"}
@@ -266,7 +261,6 @@ const EditProfilePage = () => {
               </div>
             </TabsContent>
 
-            {/* ── Preferences tab ── */}
             <TabsContent value="preferences" className="mt-4 sm:mt-6">
               <div className="p-4 space-y-5 border sm:p-6 bg-card border-border rounded-2xl card-elevated">
                 <div>

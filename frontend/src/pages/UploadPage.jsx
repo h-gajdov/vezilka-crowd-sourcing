@@ -114,7 +114,7 @@ async function fileUpload(
           const text = await res.text();
           if (text.trim()) message = text.trim();
         } catch {
-          /* keep default */
+          
         }
       }
     }
@@ -277,7 +277,7 @@ export default function UploadPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            {/* Left column — drop zone + staged files */}
+           
             <div className="space-y-4">
               <div
                 role="button"
@@ -324,7 +324,6 @@ export default function UploadPage() {
                 </div>
               </div>
 
-              {/* Hidden file input */}
               <input
                 ref={fileInputRef}
                 type="file"
@@ -350,7 +349,6 @@ export default function UploadPage() {
                           key={id}
                           className="overflow-hidden border rounded-lg border-border bg-muted/40"
                         >
-                          {/* File row */}
                           <div className="flex items-center gap-3 px-3 py-2">
                             {isMedia ? (
                               isVideo ? (
@@ -365,7 +363,6 @@ export default function UploadPage() {
                               {file.name}
                             </span>
 
-                            {/* Transcription toggle — only for audio/video */}
                             {isMedia && (
                               <button
                                 onClick={() =>
@@ -401,7 +398,6 @@ export default function UploadPage() {
                             </button>
                           </div>
 
-                          {/* Collapsible transcription panel */}
                           {isMedia && (
                             <div
                               style={{
@@ -437,7 +433,6 @@ export default function UploadPage() {
               )}
             </div>
 
-            {/* Right column — metadata + visibility */}
             <div className="space-y-5">
               <DialectDropdown value={dialect} onChange={setDialect} />
 
@@ -462,7 +457,6 @@ export default function UploadPage() {
                 />
               </div>
 
-              {/* Privacy toggle */}
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">
                   Видливост
@@ -520,7 +514,6 @@ export default function UploadPage() {
         </div>
       </main>
 
-      {/* Toast */}
       {toast && (
         <div className="fixed z-50 flex items-start w-full max-w-sm gap-3 px-4 py-3 mx-4 -translate-x-1/2 border shadow-lg bottom-6 left-1/2 rounded-xl border-destructive/30 bg-destructive/10 text-destructive">
           <X className="w-4 h-4 mt-0.5 shrink-0" />

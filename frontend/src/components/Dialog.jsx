@@ -8,7 +8,6 @@ const DialogTrigger = DialogPrimitive.Trigger;
 const DialogPortal = DialogPrimitive.Portal;
 const DialogClose = DialogPrimitive.Close;
 
-/* ---------------- Overlay ---------------- */
 const DialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
@@ -21,7 +20,6 @@ const DialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
-/* ---------------- Content ---------------- */
 const DialogContent = React.forwardRef(
   ({ className, children, ...props }, ref) => (
     <DialogPortal>
@@ -46,7 +44,6 @@ const DialogContent = React.forwardRef(
 );
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
-/* ---------------- Header ---------------- */
 const DialogHeader = ({ className, ...props }) => (
   <div
     className={cn(
@@ -57,7 +54,6 @@ const DialogHeader = ({ className, ...props }) => (
   />
 );
 
-/* ---------------- Footer ---------------- */
 const DialogFooter = ({ className, ...props }) => (
   <div
     className={cn(
@@ -68,7 +64,6 @@ const DialogFooter = ({ className, ...props }) => (
   />
 );
 
-/* ---------------- Title ---------------- */
 const DialogTitle = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
@@ -78,7 +73,6 @@ const DialogTitle = React.forwardRef(({ className, ...props }, ref) => (
 ));
 DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
-/* ---------------- Description ---------------- */
 const DialogDescription = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}

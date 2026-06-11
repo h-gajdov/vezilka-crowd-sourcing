@@ -44,7 +44,6 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
     return <Spinner />;
   }
 
-  // Mobile bottom nav items
   const mobileNavItems = [
     { icon: LayoutDashboard, label: "Табла", href: "/dashboard", index: 0 },
     { icon: Upload, label: "Прикачи", href: "/upload", index: 1 },
@@ -57,7 +56,6 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
 
   return (
     <>
-      {/* ── Desktop sidebar ── */}
       <aside
         style={{ transition: "width 300ms ease, padding 300ms ease" }}
         className="flex-col hidden overflow-hidden border-r lg:flex border-border bg-card"
@@ -82,7 +80,6 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
               }}
               className="text-xl font-bold text-gradient"
             >
-              {/* Везилка */}
               <img
                 className="object-contain w-auto h-8"
                 src="/public/vezilka-logo-horizontal-transparent.png"
@@ -167,7 +164,6 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
         </div>
       </aside>
 
-      {/* ── Mobile top bar ── */}
       <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 border-b h-14 bg-card border-border lg:hidden">
         <a href="/" className="text-lg font-bold text-gradient">
           Везилка
@@ -181,7 +177,6 @@ export default function Sidebar({ activeButtonIndex = 0 }) {
         </button>
       </header>
 
-      {/* ── Mobile bottom navigation bar ── */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-stretch border-t bg-card border-border lg:hidden">
         {mobileNavItems.map(({ icon: Icon, label, href, index }) => {
           const isActive = activeButtonIndex === index;

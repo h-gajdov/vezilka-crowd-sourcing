@@ -164,14 +164,13 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-lg border-border">
       <div className="container flex items-center justify-between h-16 px-4 mx-auto">
         <NavLink to="/" className="text-xl font-bold text-gradient">
-          {/* Везилка */}
+
           <img
             className="object-contain w-auto h-8"
             src="/public/vezilka-logo-horizontal-transparent.png"
           ></img>
         </NavLink>
 
-        {/* Desktop */}
         <div className="items-center hidden gap-1 md:flex">
           <button
             onClick={() => handleScrollNavigation("how-it-works")}
@@ -212,7 +211,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile toggle */}
         <div className="flex items-center gap-2 md:hidden">
           {user && <Avatar user={user} size="sm" />}
           <button
@@ -224,7 +222,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
       {open && (
         <div className="border-t md:hidden border-border bg-background">
           {user && (

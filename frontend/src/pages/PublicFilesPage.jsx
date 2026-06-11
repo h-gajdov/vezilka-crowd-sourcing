@@ -168,7 +168,7 @@ export default function PublicFilesPage() {
 
       <main className="flex-1 pt-20 pb-16 sm:pt-24 sm:pb-20 md:pt-32">
         <div className="max-w-6xl px-4 py-6 mx-auto sm:px-6 md:px-8 md:py-8">
-          {/* Header row — stacks on mobile, side-by-side on md+ */}
+
           <div className="flex flex-col gap-4 mb-6 sm:mb-8 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-xl font-bold sm:text-2xl md:text-3xl">
@@ -179,7 +179,6 @@ export default function PublicFilesPage() {
               </p>
             </div>
 
-            {/* Search — full width on mobile, fixed on md+ */}
             <div className="relative w-full md:w-80">
               <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
               <input
@@ -198,7 +197,6 @@ export default function PublicFilesPage() {
             </div>
           ) : files.length > 0 ? (
             <>
-              {/* File cards grid */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
                 {files.map((file) => {
                   const { Icon, color, bg, label } = getIconConfig(file.type);
@@ -209,7 +207,6 @@ export default function PublicFilesPage() {
                       key={file.id}
                       className="flex flex-col h-full p-4 border sm:p-5 bg-card border-border rounded-2xl card-elevated"
                     >
-                      {/* Type icon + badge */}
                       <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div className={`p-2.5 rounded-xl ${bg} ${color}`}>
                           <Icon className="w-5 h-5" />
@@ -219,7 +216,6 @@ export default function PublicFilesPage() {
                         </span>
                       </div>
 
-                      {/* Title */}
                       <h3
                         className="text-base font-semibold line-clamp-1 sm:text-lg"
                         title={file.topic}
@@ -241,9 +237,8 @@ export default function PublicFilesPage() {
                           "Нема додадено опис за оваа содржина."}
                       </p>
 
-                      {/* Meta */}
                       <div className="mt-4 mb-4 text-xs text-muted-foreground">
-                        {/* Uploader row */}
+                        
                         <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50 mb-3">
                           {file.avatarUrl ? (
                             <img
@@ -268,7 +263,6 @@ export default function PublicFilesPage() {
                           </div>
                         </div>
 
-                        {/* Dialect + score + date */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
                             <span className="font-medium text-foreground">
@@ -317,9 +311,8 @@ export default function PublicFilesPage() {
                 })}
               </div>
 
-              {/* Pagination bar */}
               <div className="flex flex-col items-center gap-4 p-4 mt-8 border sm:p-5 sm:gap-5 sm:mt-10 xl:flex-row xl:justify-between bg-card border-border rounded-xl">
-                {/* Page size selector */}
+                
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <label
                     htmlFor="pageSizeSelect"
@@ -348,7 +341,7 @@ export default function PublicFilesPage() {
 
                 {totalPages > 1 && (
                   <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-5">
-                    {/* Page number buttons — shrink ellipsis on small screens */}
+                  
                     <div className="flex items-center gap-0.5 sm:gap-1 flex-wrap justify-center">
                       <Button
                         variant="outline"
@@ -395,7 +388,6 @@ export default function PublicFilesPage() {
                       </Button>
                     </div>
 
-                    {/* Jump to page */}
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <span className="whitespace-nowrap">Оди на:</span>
                       <input
@@ -414,7 +406,6 @@ export default function PublicFilesPage() {
               </div>
             </>
           ) : (
-            /* Empty state */
             <div className="flex flex-col items-center justify-center p-8 text-center border border-dashed sm:p-10 rounded-2xl border-border bg-card/50">
               <div className="p-4 mb-4 rounded-full bg-muted">
                 <Inbox className="w-8 h-8 text-muted-foreground" />
