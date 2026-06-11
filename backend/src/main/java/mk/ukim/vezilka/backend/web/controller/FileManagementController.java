@@ -9,6 +9,7 @@ import mk.ukim.vezilka.backend.service.TranscriptionService;
 import mk.ukim.vezilka.backend.web.request.ReviewRequest;
 import mk.ukim.vezilka.backend.service.FileValidationService;
 import mk.ukim.vezilka.backend.web.request.UploadContentRequest;
+import mk.ukim.vezilka.backend.web.response.ReviewResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -77,17 +78,19 @@ public class FileManagementController {
     }
 
     @PostMapping("/reject")
-    public ResponseEntity<Review> rejectFile(@RequestBody ReviewRequest request,Authentication authentication) {
+    public ResponseEntity<ReviewResponse> rejectFile(@RequestBody ReviewRequest request, Authentication authentication) {
         String email=authentication.getName();
         Review result = fileManagementService.rejectFile(request.getId(),request.getComment(),email, request.getQualityScore(), request.getTranscription());
-        return ResponseEntity.ok(result);
+        ReviewResponse response=new ReviewResponse(result);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/accept")
-    public ResponseEntity<Review> acceptFile(@RequestBody ReviewRequest request,Authentication authentication) {
+    public ResponseEntity<ReviewResponse> acceptFile(@RequestBody ReviewRequest request,Authentication authentication) {
         String email=authentication.getName();
         Review result = fileManagementService.acceptFile(request.getId(),request.getComment(),email, request.getQualityScore(), request.getTranscription());
-        return ResponseEntity.ok(result);
+        ReviewResponse response=new ReviewResponse(result);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/transcription/{contentId}")
